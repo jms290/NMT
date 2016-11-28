@@ -50,6 +50,6 @@ This should start SUMA, and you should see the left and right WM surfaces. To sw
 
 Toggle the "t" key to open the connection between AFNI and SUMA. You should see various outlines on the NMT volume in AFNI that correspond with the surfaces loaded into SUMA. To edit or remove the outlines in AFNI, toggle the "Control Surface" button in the AFNI GUI.
 
-Now that AFNI and SUMA are linked, this will allow you to vizualze any data (i.e. overlay) from the NMT volume on the surface. Note that only the voxels which intersect the surface outlines will be plotted on the surface. As such, we suggest using the "mid" surface for the visualization of any functional MRI data.   
+Now that AFNI and SUMA are linked, this will allow you to vizualze any data (i.e. overlay) from the NMT volume on the surface. Note that only the voxels which intersect the surface outlines will be plotted on the surface. As such, we suggest using the "mid" surface for the visualization of any functional MRI data. For more information about using AFNI interactively, see this [slide show](https://afni.nimh.nih.gov/pub/dist/edu/latest/afni_handouts/afni03_interactive.pdf). 
 
 
