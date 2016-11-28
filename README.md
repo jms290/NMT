@@ -12,11 +12,11 @@ To download from the terminal, navigate to the directory where you want to store
 git clone http://github.com/jms290/NMT.git
 ```
 
-Otherwise, click the green button "clone or download" on the NMT page...
+Otherwise, on the [NMT repository homepage](https://github.com/jms290/NMT), click the green button "clone or download"...
 
-## List of NMT files
+## NMT Files
 
-All volume and surface files are stored in the relatively universal Nifti (.nii.gz) and Gifti (.gii) formats, to be compatible with a plethora of software packages. 
+All volume and surface files are stored in the relatively universal nifti (.nii.gz) and gifti (.gii) formats, to be compatible with a plethora of software packages. 
 
 - NMT volume (with skull) - **NMT.nii.gz**
 - NMT brain mask - **NMT_brain-mask.nii.gz**
@@ -24,7 +24,7 @@ All volume and surface files are stored in the relatively universal Nifti (.nii.
 	+ Gray matter - **NMT_segmentation_GM.nii.gz**
 	+ White matter - **NMT_segmentation_WM.nii.gz**
 	+ Cerebral spinal fluid - **NMT_segmentation_CSF.nii.gz**
-- NMT 3-tissue segmentation mask (combination of 50% thresholded probabilistic masks) - **NMT_segmentation.nii.gz**
+- NMT 3-tissue segmentation mask - **NMT_segmentation.nii.gz**
 - NMT surfaces
 	+ Gray matter surface - **[lh or rh].GM.gii**
 	+ White matter surface - **[lh or rh].WM.gii**
@@ -33,5 +33,23 @@ All volume and surface files are stored in the relatively universal Nifti (.nii.
 	+ Gray matter surface - **[lh or rh].GM_inflated.gii**
 	+ White matter surface - **[lh or rh].WM_inflated.gii**
 	+ Mid-cortical surface - **[lh or rh].mid_inflated.gii**
-        
+
+There is also a .spec file - **NMT_both.spec**, which is a text file used by SUMA to load in each of the left and right hemisphere surfaces above. 
+	
+## Visualization in AFNI/SUMA
+
+Navigate to the directory where you have stored the NMT repository. Then follow these steps:
+```bash
+afni -niml &
+```
+This will start AFNI and tell AFNI that a connection with SUMA is imminent. Load in NMT.nii.gz as the underlay if it is not loaded automatically. Then, back in the terminal, run:
+```bash
+suma -spec ./NMT_both.spec -sv ./NMT.nii.gz &
+```
+This should start SUMA, and you should see the left and right WM surfaces. To switch to a different set of surfaces, move your cursor into the SUMA window and toggle the "." key. For other navigational shortcuts and tools, see the [SUMA documentation](https://afni.nimh.nih.gov/sscc/staff/ziad/SUMA/SUMA_do1.htm). 
+
+Toggle the "t" key to open the connection between AFNI and SUMA. You should see various outlines on the NMT volume in AFNI that correspond with the surfaces loaded into SUMA. To edit or remove the outlines in AFNI, toggle the "Control Surface" button in the AFNI GUI.
+
+Now that AFNI and SUMA are linked, this will allow you to vizualze any data (i.e. overlay) from the NMT volume on the surface. Note that only the voxels which intersect the surface outlines will be plotted on the surface. As such, we suggest using the "mid" surface for the visualization of any functional MRI data.   
+
 
