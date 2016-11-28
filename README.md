@@ -8,7 +8,7 @@ This README file provides an overview of the NMT MRI volume and its associated v
 ## Download
 
 To download from the terminal, navigate to the directory where you want to store the NMT repository. Then, copy and paste this command:
-	- git clone https://github.com/jms290/NMT
+	-git clone https://github.com/jms290/NMT
 
 ## Files
 - NMT volume (with skull)
