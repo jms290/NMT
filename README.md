@@ -19,12 +19,16 @@ Otherwise, on the [NMT repository homepage](https://github.com/jms290/NMT), clic
 All volume and surface files are stored in the relatively universal nifti (.nii.gz) and gifti (.gii) formats, to be compatible with a plethora of software packages. 
 
 - NMT volume (with skull) - **NMT.nii.gz**
-- NMT brain mask - **NMT_brain-mask.nii.gz**
+- NMT brain mask - **NMT_brainmask.nii.gz**
 - NMT probabilisitic tissue segmentation masks
 	+ Gray matter - **NMT_segmentation_GM.nii.gz**
 	+ White matter - **NMT_segmentation_WM.nii.gz**
 	+ Cerebral spinal fluid - **NMT_segmentation_CSF.nii.gz**
-- NMT 3-tissue segmentation mask - **NMT_segmentation.nii.gz**
+- NMT cortical gray matter mask - **NMT_GM_cortical_mask.nii.gz** 
+- NMT 4-tissue segmentation mask (including arterial blood vasculature) - **NMT_segmentation_4class.nii.gz**
+- NMT arterial blood vasculature - **NMT_blood_vessels_mask.nii.gz**
+- NMT cerebellum - **NMT_cerebellum_mask.nii.gz**
+- NMT olfactory bulb - **NMT_olfactory_bulb_mask.nii.gz**
 - NMT surfaces
 	+ Gray matter surface - **[lh or rh].GM.gii**
 	+ White matter surface - **[lh or rh].WM.gii**
@@ -33,6 +37,10 @@ All volume and surface files are stored in the relatively universal nifti (.nii.
 	+ Gray matter surface - **[lh or rh].GM_inflated.gii**
 	+ White matter surface - **[lh or rh].WM_inflated.gii**
 	+ Mid-cortical surface - **[lh or rh].mid_inflated.gii**
+- NMT surfaces (other)
+	+ Arterial blood vasculature - **blood_vasculature.gii**
+	+ Cerebellum surface - **cerebellum.gii**
+	+ Olfactory bulb surface - **olfactory_bulb.gii**
 
 There is also a .spec file - **NMT_both.spec**, which is a text file used by SUMA to load in each of the left and right hemisphere surfaces above. 
 	
