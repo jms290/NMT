@@ -26,7 +26,7 @@ All volume and surface files are stored in the relatively universal nifti (.nii.
 	+ Cerebral spinal fluid - **NMT_segmentation_CSF.nii.gz**
 - NMT cortical gray matter mask - **NMT_GM_cortical_mask.nii.gz** 
 - NMT 4-tissue segmentation mask (including arterial blood vasculature) - **NMT_segmentation_4class.nii.gz**
-- NMT arterial blood vasculature - **NMT_blood_vessels_mask.nii.gz**
+- NMT arterial blood vasculature - **NMT_blood_vasculature_mask.nii.gz**
 - NMT cerebellum - **NMT_cerebellum_mask.nii.gz**
 - NMT olfactory bulb - **NMT_olfactory_bulb_mask.nii.gz**
 - NMT surfaces
