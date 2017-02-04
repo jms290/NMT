@@ -5,6 +5,12 @@ The NMT is an anatomical structural MRI template of the macaque brain. It was cr
 
 This README file provides an overview of the NMT MRI volume and its associated volume and surface files. Sample commands for visualizing the surfaces are listed as well, using [SUMA](https://afni.nimh.nih.gov/afni/suma) from the [AFNI](https://afni.nimh.nih.gov) software suite. 
 
+## Citation
+
+If you use this repository, please cite the paper below:
+
+Seidlitz, J., Sponheim, C., Glen, D., Ye, F.Q., Saleem, K.S., Leopold, D.A., Ungerleider, L., Messinger, A. A population MRI brain template and analysis tools for the macaque. bioRxiv doi: 10.1101/105874
+
 ## Download
 
 To download from the terminal, navigate to the directory where you want to store the NMT repository. Then, copy and paste this command:
