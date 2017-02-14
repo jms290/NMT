@@ -74,6 +74,7 @@ Along with the NMT dataset, we provide scripts to automated the processing of si
 See the [paper](http://biorxiv.org/content/early/2017/02/03/105874) as well as the table in the [supplemental material](http://biorxiv.org/content/biorxiv/suppl/2017/02/03/105874.DC1/105874-1.pdf) for more information. Below is the usage for each script. Keep in mind these two important things:
 
 ***-These scripts require AFNI and [ANTs](http://stnava.github.io/ANTs/) to be installed***
+
 ***-Only a reconstructed T1-weighted scan/volume is needed (either AFNI .BRIK/.HEAD or Nifti .nii or .nii.gz format)***
 
 # NMT_subject_align
