@@ -77,7 +77,7 @@ See the [paper](http://biorxiv.org/content/early/2017/02/03/105874) as well as t
 
 ***-Only a reconstructed T1-weighted scan/volume is needed (either AFNI .BRIK/.HEAD or Nifti .nii or .nii.gz format)***
 
-# NMT_subject_align
+### NMT_subject_align
 ```tcsh
 tcsh NMT_subject_align.csh [subject] ../NMT.nii.gz
 ```
@@ -87,13 +87,13 @@ Create a directory where the NMT distribution is stored, and copy the scans of t
 tcsh NMT_subject_align.csh [subject_without_skull] ../NMT_SS.nii.gz
 ```
 
-# NMT_subject_process
+### NMT_subject_process
 ```bash
 bash NMT_subject_process [subject]
 ```
 Run this script from the directory where the NMT_subject_align output lies. This script will create a directory NMT_[subject]_process with the corresponding masks in the subject's anatomical space.
 
-# NMT_subject_morph
+### NMT_subject_morph
 ```bash
 bash NMT_subject_morph [subject]
 ```
