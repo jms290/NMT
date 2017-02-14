@@ -71,11 +71,10 @@ Now that AFNI and SUMA are linked, this will allow you to vizualze any data (i.e
 
 Along with the NMT dataset, we provide scripts to automated the processing of single subjects. The **NMT_subject_align script** generates the rigid (6 parameter), affine (12 parameter), and non-linear (voxelwise) transformations to and from the NMT. The **NMT_subject_process** and **NMT_subject_morph** scripts depend on these transformations. **NMT_subject_process** performs N4 bias field correction for normalizing intensity non-uniformities, and generates a brain mask (for skull-stripping) as well as probabilistic tissue segmentation masks (GM, WM, CSF). **NMT_subject_morph** uses the NMT's cortical GM mask to produce volumetric maps of cortical thickness, surface area, and mean and gaussian (i.e., intrinsic) curvature.
 
-*These scripts require AFNI and [ANTs](http://stnava.github.io/ANTs/) to be installed*
+See the [paper](http://biorxiv.org/content/early/2017/02/03/105874) as well as the table in the [supplemental material](http://biorxiv.org/content/biorxiv/suppl/2017/02/03/105874.DC1/105874-1.pdf) for more information. Below is the usage for each script. Keep in mind these two important things:
 
-See the [paper](http://biorxiv.org/content/early/2017/02/03/105874) as well as the table in the [supplemental material](http://biorxiv.org/content/biorxiv/suppl/2017/02/03/105874.DC1/105874-1.pdf) for more information. Below is the usage for each script.
-
-***Only a reconstructed T1-weighted anatomical scan/volume is needed (either AFNI .BRIK/.HEAD or Nifti .nii or .nii.gz format)***
+***-These scripts require AFNI and [ANTs](http://stnava.github.io/ANTs/) to be installed***
+***-Only a reconstructed T1-weighted scan/volume is needed (either AFNI .BRIK/.HEAD or Nifti .nii or .nii.gz format)***
 
 # NMT_subject_align
 ```tcsh
