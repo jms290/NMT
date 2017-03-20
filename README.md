@@ -56,10 +56,16 @@ There is also a .spec file - **NMT_both.spec**, which is a text file used by SUM
 
 ## Transformations from the NMT to the F99 and D99 templates
 
-We include the rigid, affine, and diffeomorphic (non-linear) tranformations from the NMT to both the F99 and D99 templates. However, due to the size of the non-linear transformation files, we are hosting them on Dropbox. They can be downloaded from [here](  https://drive.google.com/open?id=0B07w_FBo9wpIWU5Uc3k2SWFHYWs). The D99 template and atlas can be downloaded from [here](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/macaqueatlas_1.2a/). An example command to align the D99 atlas to the NMT (using AFNI's 3dNwarpApply command) is provided below:
+We include the rigid, affine, and diffeomorphic (non-linear) tranformations to the NMT from both the F99 and D99 templates. However, due to the size of the non-linear transformation files, we are hosting them on Dropbox. They can be downloaded from [here](  https://drive.google.com/open?id=0B07w_FBo9wpIWU5Uc3k2SWFHYWs). The D99 template and atlas can be downloaded from [here](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/macaqueatlas_1.2a/). An example command to align the D99 atlas to the NMT (using AFNI's 3dNwarpApply command) is provided below:
 
 ```bash
-3dNwarpApply -nwarp '' -source D99_atlas_1.2a.nii.gz -prefix D99_atlas_1.2a_al2NMT.nii.gz -ainterp NN -short
+3dNwarpApply -nwarp 'D99_template_shft.1D D99_template_shft_al2std_mat.aff12.1D D99_template_shft_WARP.nii.gz' -source D99_atlas_1.2a.nii.gz -prefix D99_atlas_1.2a_al2NMT.nii.gz -ainterp NN -short
+```
+
+To go from the NMT to the D99 simply reverse the order of the transformations and add the INV() to each transformation file:
+
+```bash
+3dNwarpApply -nwarp 'INV(D99_template_shft_WARP.nii.gz) INV(D99_template_shft_al2std_mat.aff12.1D) INV(D99_template_shft.1D)' -source D99_atlas_1.2a_al2NMT.nii.gz -prefix D99_atlas_1.2a.nii.gz -ainterp NN -short
 ```
 	
 ## Visualization in AFNI/SUMA
