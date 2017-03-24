@@ -92,6 +92,8 @@ See the [paper](http://biorxiv.org/content/early/2017/02/03/105874) as well as t
 
 ***-These scripts require AFNI and [ANTs](http://stnava.github.io/ANTs/) to be installed***
 
+***-NOTE: NMT_subject_align only requires the AFNI software package to run correctly***
+
 ***-Only a reconstructed T1-weighted scan/volume is needed (either AFNI .BRIK/.HEAD or Nifti .nii or .nii.gz format)***
 
 ### NMT_subject_align
