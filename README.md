@@ -22,6 +22,12 @@ git clone http://github.com/jms290/NMT.git
 
 Otherwise, on the [NMT repository homepage](https://github.com/jms290/NMT), click the green button "clone or download"...
 
+To dowload the Full-head version of the NMT, which includes more peripheral tissue, download from the following google drive link:
+
+https://drive.google.com/open?id=0B07w_FBo9wpIbjlFeEFORnhwaWc
+
+
+
 ## NMT Files
 
 All volume and surface files are stored in the relatively universal nifti (.nii.gz) and gifti (.gii) formats, to be compatible with a plethora of software packages. 
