@@ -41,8 +41,6 @@ All volume and surface files are stored in the relatively universal nifti (.nii.
 	+ White matter - **NMT_segmentation_WM.nii.gz**
 	+ Cerebral spinal fluid - **NMT_segmentation_CSF.nii.gz**
 - NMT cortical gray matter mask - **NMT_GM_cortical_mask.nii.gz** 
-- NMT cortical gray matter mask (with white matter) - **NMT_GM_cortical_mask_withWM.nii.gz**
-- NMT cortical thickness - **NMT_CT.nii.gz**
 - NMT 4-tissue segmentation mask (including arterial blood vasculature) - **NMT_segmentation_4class.nii.gz**
 - NMT arterial blood vasculature - **NMT_blood_vasculature_mask.nii.gz**
 - NMT cerebellum - **NMT_cerebellum_mask.nii.gz**
@@ -58,7 +56,6 @@ All volume and surface files are stored in the relatively universal nifti (.nii.
 - NMT surfaces (other)
 	+ Arterial blood vasculature - **blood_vasculature.gii**
 	+ Cerebellum surface - **cerebellum.gii**
-	+ Olfactory bulb surface - **olfactory_bulb.gii**
 
 There is also a .spec file - **NMT_both.spec**, which is a text file used by SUMA to load in each of the left and right hemisphere surfaces above. 
 
