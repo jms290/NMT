@@ -26,9 +26,10 @@ To download the Full-head version of the NMT, which includes more peripheral tis
 
 https://drive.google.com/open?id=0B07w_FBo9wpIbjlFeEFORnhwaWc
 
-To download a skull-stripped version of the NMT instead of multiplying the supplied NMT template by the included brain mask, follow this google drive link:
+To download the nonlinear components of the volumetric transformations the NMT, download from the following google drive link:
 
-https://drive.google.com/open?id=0B07w_FBo9wpIV3I4M08wa2paUTg
+https://drive.google.com/open?id=0B07w_FBo9wpIWFhtV2dWcjhyTnM
+
 
 ## NMT Files
 
