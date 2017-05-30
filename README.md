@@ -11,7 +11,7 @@ This README file provides an overview of the NMT MRI volume and its associated v
 
 If you use this repository, please cite the paper below:
 
-Seidlitz, J., Sponheim, C., Glen, D., Ye, F.Q., Saleem, K.S., Leopold, D.A., Ungerleider, L., Messinger, A. A population MRI brain template and analysis tools for the macaque. bioRxiv doi: [10.1101/105874](http://biorxiv.org/content/early/2017/02/03/105874)
+Seidlitz, J., Sponheim, C., Glen, D., Ye, F.Q., Saleem, K.S., Leopold, D.A., Ungerleider, L., Messinger, A. A population MRI brain template and analysis tools for the macaque. *NeuroImage* (2017). doi: [10.1101/105874](http://www.sciencedirect.com/science/article/pii/S105381191730383X)
 
 ## Download
 
