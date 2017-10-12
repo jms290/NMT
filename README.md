@@ -96,9 +96,9 @@ Along with the NMT dataset, we provide scripts to automated the processing of si
 
 See the [paper](http://biorxiv.org/content/early/2017/02/03/105874) as well as the table in the [supplemental material](http://biorxiv.org/content/biorxiv/suppl/2017/02/03/105874.DC1/105874-1.pdf) for more information. Below is the usage for each script. Keep in mind these two important things:
 
-***-These scripts require AFNI and [ANTs](http://stnava.github.io/ANTs/) to be installed***
+***-NOTE: NMT_subject_align requires the AFNI software package to run correctly***
 
-***-NOTE: NMT_subject_align only requires the AFNI software package to run correctly***
+***-NOTE: NMT_subject_process and NMT_subject_morph require AFNI and [ANTs](http://stnava.github.io/ANTs/) to be installed***
 
 ***-Only a reconstructed T1-weighted scan/volume is needed (either AFNI .BRIK/.HEAD or Nifti .nii or .nii.gz format)***
 
@@ -106,9 +106,8 @@ See the [paper](http://biorxiv.org/content/early/2017/02/03/105874) as well as t
 ```tcsh
 tcsh NMT_subject_align.csh [subject] ../NMT.nii.gz
 ```
-Create a directory where the NMT distribution is stored, and copy the scans of the individual subjects into this new directory. Copy or move this script to the new directory and run this script using a single scan as input, along with the NMT in the parent directory. If the brain has already been masked out from your subject (i.e., skull-stripped), generate a skull-stripped version of the NMT using the NMT's brain mask and use this as input to NMT_subject_align, as below. From the newly created directory:
+Create a directory where the NMT distribution is stored, and copy the scans of the individual subjects into this new directory. Copy or move this script to the new directory and run this script using a single scan as input, along with the NMT in the parent directory. If the brain has already been masked out from your subject (i.e., skull-stripped), utilize the skull-stripped version of the NMT (NMT_SS.nii.gz) as input to NMT_subject_align, as below:
 ```tcsh
-3dcalc -a ../NMT.nii.gz -b ../NMT_brainmask.nii.gz -expr 'a*b' -prefix ../NMT_SS.nii.gz
 tcsh NMT_subject_align.csh [subject_without_skull] ../NMT_SS.nii.gz
 ```
 
