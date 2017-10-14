@@ -71,6 +71,7 @@ rm tmp.nii.gz
 
 # Brain extraction
 
+$ANTSPATH/antsBrainExtraction.sh -d 3 -a ${name}_N4.nii.gz -e ../../NMT.nii.gz -m ../../NMT_brainmask.nii.gz -o ${name}_
 
 rm -r ${name}_ # remove directory that ANTs makes
 cp ${name}_BrainExtractionBrain.nii.gz ${name}_brain.nii.gz # change filenames 
