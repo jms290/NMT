@@ -74,7 +74,7 @@ cd ./NMT_${name}_morph
 
 # N4 intensity normalization over entire volume
 
-$ANTSPATH/N4BiasFieldCorrection -d 3 -i tmp.nii.gz -o tmp.nii.gz -overwrite
+$ANTSPATH/N4BiasFieldCorrection -d 3 -i tmp.nii.gz -o tmp.nii.gz
 
 # Cortical thickness estimation
 
@@ -94,25 +94,25 @@ $ANTSPATH/SurfaceCurvature tmp.nii.gz ${name}_gausscurv.nii.gz 1 6
 
 #3dNwarpApply -prefix ${name}_GM_cortical_mask.nii.gz ${name}_CT.nii.gz ${name}_SA.nii.gz ${name}_meancurv.nii.gz ${name}_gausscurv.nii.gz -master $1 -nwarp tmp6.1D -ainterp NN -overwrite
 3dAllineate -base ../$1 -source tmp.nii.gz -1Dmatrix_apply ${name}_shft_inv.aff12.1D -master ../$1 -prefix ${name}_N4.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply ${name}_shft_inv_shft.1D -final wsinc5 -prefix ${name}_N4.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply ${name}_inv_shft.1D -final wsinc5 -prefix ${name}_N4.nii.gz -overwrite
 
 3dAllineate -base ../$1 -source ${name}_GM_cortical_mask.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -master ../$1 -prefix ${name}_GM_cortical_mask.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_GM_cortical_mask.nii.gz -1Dmatrix_apply ../${name}_shft_inv_shft.1D -final NN -prefix ${name}_GM_cortical_mask.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_GM_cortical_mask.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_GM_cortical_mask.nii.gz -overwrite
 
 3dAllineate -base ../$1 -source ${name}_GM_cortical_mask_withWM.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -master ../$1 -prefix ${name}_GM_cortical_mask_withWM.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_GM_cortical_mask_withWM.nii.gz -1Dmatrix_apply ../${name}_shft_inv_shft.1D -final NN -prefix ${name}_GM_cortical_mask_withWM.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_GM_cortical_mask_withWM.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_GM_cortical_mask_withWM.nii.gz -overwrite
 
 3dAllineate -base ../$1 -source ${name}_CT.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -master ../$1 -prefix ${name}_CT.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_CT.nii.gz -1Dmatrix_apply ../${name}_shft_inv_shft.1D -final NN -prefix ${name}_CT.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_CT.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_CT.nii.gz -overwrite
 
 3dAllineate -base ../$1 -source ${name}_SA.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -master ../$1 -prefix ${name}_SA.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_SA.nii.gz -1Dmatrix_apply ../${name}_shft_inv_shft.1D -final NN -prefix ${name}_SA.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_SA.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_SA.nii.gz -overwrite
 
 3dAllineate -base ../$1 -source ${name}_meancurv.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -master ../$1 -prefix ${name}_meancurv.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_meancurv.nii.gz -1Dmatrix_apply ../${name}_shft_inv_shft.1D -final NN -prefix ${name}_meancurv.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_meancurv.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_meancurv.nii.gz -overwrite
 
 3dAllineate -base ../$1 -source ${name}_gausscurv.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -master ../$1 -prefix ${name}_gausscurv.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_gausscurv.nii.gz -1Dmatrix_apply ../${name}_shft_inv_shft.1D -final NN -prefix ${name}_gausscurv.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_gausscurv.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_gausscurv.nii.gz -overwrite
 rm tmp.nii.gz
 #rm -r tmp*.1D
 
