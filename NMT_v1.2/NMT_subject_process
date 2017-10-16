@@ -62,7 +62,7 @@ cd ./NMT_${name}_process
 # Linear aligment of subject's anatomical volume using the 6- and 12-parameter tranformation files from NMT_subject_align
 
 3dAllineate -base ../../NMT.nii.gz -source ../${name}.nii.gz -1Dmatrix_apply ../${name}_shft.1D -prefix tmp.nii.gz -overwrite
-3dAllineate -base ../../NMT.nii.gz -source ../${name}.nii.gz -1Dmatrix_apply ../${name}_shft_al2std_mat.aff12.1D -prefix tmp.nii.gz -overwrite
+3dAllineate -base ../../NMT.nii.gz -source tmp.nii.gz -1Dmatrix_apply ../${name}_shft_al2std_mat.aff12.1D -prefix tmp.nii.gz -overwrite
 
 # N4 intensity normalization over entire volume
 
