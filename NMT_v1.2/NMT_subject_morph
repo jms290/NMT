@@ -63,7 +63,7 @@ cd ./NMT_${name}_morph
 # Linearly align subject to NMT
 
 3dAllineate -base ../../NMT.nii.gz -source ../${name}.nii.gz -1Dmatrix_apply ../${name}_shft.1D -master ../../NMT.nii.gz -prefix tmp.nii.gz -overwrite
-3dAllineate -base ../../NMT.nii.gz -source ../${name}.nii.gz -1Dmatrix_apply ../${name}_shft_al2std_mat.aff12.1D -master ../../NMT.nii.gz -prefix tmp.nii.gz -overwrite
+3dAllineate -base ../../NMT.nii.gz -source tmp.nii.gz -1Dmatrix_apply ../${name}_shft_al2std_mat.aff12.1D -master ../../NMT.nii.gz -prefix tmp.nii.gz -overwrite
 
 # Alignment of NMT's GM mask to subject
 
