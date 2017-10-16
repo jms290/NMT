@@ -61,9 +61,12 @@ cd ./NMT_${name}_process
 
 # Linear aligment of subject's anatomical volume using the 6- and 12-parameter tranformation files from NMT_subject_align
 
-3dAllineate -base ../../NMT.nii.gz -source ../${name}.nii.gz -1Dmatrix_apply ../${name}_shft.1D -prefix tmp.nii.gz -overwrite
-3dAllineate -base ../../NMT.nii.gz -source tmp.nii.gz -1Dmatrix_apply ../${name}_shft_al2std_mat.aff12.1D -prefix tmp.nii.gz -overwrite
+#3dAllineate -base ../../NMT.nii.gz -source ../${name}.nii.gz -1Dmatrix_apply ../${name}_shft.1D -prefix tmp.nii.gz -overwrite
+#3dAllineate -base ../../NMT.nii.gz -source tmp.nii.gz -1Dmatrix_apply ../${name}_shft_al2std_mat.aff12.1D -prefix tmp.nii.gz -overwrite
 
+cat_matvec ../${name}_shft.1D ../${name}_shft_al2std_mat.aff12.1D -ONELINE > tmp_linear_align.1D
+
+3dAllineate -base ../../NMT.nii.gz -source ../${name}.nii.gz -1Dmatrix_apply tmp_linear_align.1D -prefix tmp.nii.gz -overwrite
 # N4 intensity normalization over entire volume
 
 $ANTSPATH/N4BiasFieldCorrection -d 3 -i tmp.nii.gz -o ${name}_N4.nii.gz
@@ -102,26 +105,46 @@ rm -r ${name}_N4Truncated0.nii.gz
 #cat_matvec ../${name}_shft.1D -I > tmp6.1D # create temporary inverse rigid-body transformation
 #cat_matvec ../${name}_shft_al2std_mat.aff12.1D -I > tmp12.1D # create temporary inverse affine transformation
 #3dNwarpApply -prefix ${name}_N4.nii.gz ${name}_brain.nii.gz ${name}_brainmask.nii.gz ${name}_segmentation.nii.gz ${name}_segmentation_CSF.nii.gz ${name}_segmentation_GM.nii.gz ${name}_segmentation_WM.nii.gz -source ${name}_N4.nii.gz ${name}_brain.nii.gz ${name}_brainmask.nii.gz ${name}_segmentation.nii.gz ${name}_segmentation_CSF.nii.gz ${name}_segmentation_GM.nii.gz ${name}_segmentation_WM.nii.gz -master ../$1 -nwarp '../${name}_shft_al2std_mat.aff12.1D ../../${name}_shft_WARP.nii.gz ../../${name}_shft_INVWARP.nii.gz tmp12.1D tmp6.1D' -ainterp NN -overwrite
-3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -prefix ${name}_N4.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -prefix ${name}_N4.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_brain.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -prefix ${name}_brain.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_brain.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -prefix ${name}_brain.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_brainmask.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -prefix ${name}_brainmask.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_brainmask.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -prefix ${name}_brainmask.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_segmentation.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -prefix ${name}_segmentation.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_segmentation.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_segmentation.nii.gz -overwrite
+#3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -prefix ${name}_N4.nii.gz -overwrite
+#3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -prefix ${name}_N4.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_segmentation_CSF.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -prefix ${name}_segmentation_CSF.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_segmentation_CSF.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_segmentation_CSF.nii.gz -overwrite
+#3dAllineate -base ../$1 -source ${name}_brain.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -prefix ${name}_brain.nii.gz -overwrite
+#3dAllineate -base ../$1 -source ${name}_brain.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -prefix ${name}_brain.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_segmentation_GM.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -prefix ${name}_segmentation_GM.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_segmentation_GM.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_segmentation_GM.nii.gz -overwrite
+#3dAllineate -base ../$1 -source ${name}_brainmask.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -prefix ${name}_brainmask.nii.gz -overwrite
+#3dAllineate -base ../$1 -source ${name}_brainmask.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -prefix ${name}_brainmask.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_segmentation_WM.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -prefix ${name}_segmentation_WM.nii.gz -overwrite
-3dAllineate -base ../$1 -source ${name}_segmentation_WM.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_segmentation_WM.nii.gz -overwrite
+#3dAllineate -base ../$1 -source ${name}_segmentation.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -prefix ${name}_segmentation.nii.gz -overwrite
+#3dAllineate -base ../$1 -source ${name}_segmentation.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_segmentation.nii.gz -overwrite
+
+#3dAllineate -base ../$1 -source ${name}_segmentation_CSF.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -prefix ${name}_segmentation_CSF.nii.gz -overwrite
+#3dAllineate -base ../$1 -source ${name}_segmentation_CSF.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_segmentation_CSF.nii.gz -overwrite
+
+#3dAllineate -base ../$1 -source ${name}_segmentation_GM.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -prefix ${name}_segmentation_GM.nii.gz -overwrite
+#3dAllineate -base ../$1 -source ${name}_segmentation_GM.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_segmentation_GM.nii.gz -overwrite
+
+#3dAllineate -base ../$1 -source ${name}_segmentation_WM.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -prefix ${name}_segmentation_WM.nii.gz -overwrite
+#3dAllineate -base ../$1 -source ${name}_segmentation_WM.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_segmentation_WM.nii.gz -overwrite
+
+cat_matvec ../${name}_shft_inv.aff12.1D ../${name}_inv_shft.1D -ONELINE > tmp_inv_linear.1D
+
+3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -prefix ${name}_N4.nii.gz -overwrite
+
+3dAllineate -base ../$1 -source ${name}_brain.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -prefix ${name}_brain.nii.gz -overwrite
+
+3dAllineate -base ../$1 -source ${name}_brainmask.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -prefix ${name}_brainmask.nii.gz -overwrite
+
+3dAllineate -base ../$1 -source ${name}_segmentation.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -prefix ${name}_segmentation.nii.gz -overwrite
+
+3dAllineate -base ../$1 -source ${name}_segmentation_CSF.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -prefix ${name}_segmentation_CSF.nii.gz -overwrite
+
+3dAllineate -base ../$1 -source ${name}_segmentation_GM.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -prefix ${name}_segmentation_GM.nii.gz -overwrite
+
+3dAllineate -base ../$1 -source ${name}_segmentation_WM.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -prefix ${name}_segmentation_WM.nii.gz -overwrite
+
 rm -r tmp*.1D # remove temporary inverse warp files 
 
 
