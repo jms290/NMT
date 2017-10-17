@@ -3,7 +3,7 @@
 # for individual subjects
 #
 # usage:
-#       NMT_subject_morph [subject volume]
+#       NMT_subject_morph [subject volume] [space=ORIG/NMT] [log=0/1]
 #
 # dependencies:
 #		ANTs
@@ -37,7 +37,8 @@ if [ "${name#*.}" = "nii" ]
 	then
 	name=${name[*]%.*}
 fi
-
+space=${2:-ORIG}
+log=${3:-0}
 
 # Make an output directory of NMT_subject_morph for the subject
 mkdir NMT_${name}_morph
@@ -45,39 +46,30 @@ cd ./NMT_${name}_morph
 
 
 ## Optional log file
-#exec 3>&1 4>&2
-#trap 'exec 2>&4 1>&3' 0 1 2 3
-#exec 1>NMT_${name}_morph_log.out 2>&1
-## Everything below will go to the file '*_log.out':
-
+if [ "$log" = 1 ]
+	then
+	exec 3>&1 4>&2
+	trap 'exec 2>&4 1>&3' 0 1 2 3
+	exec 1>NMT_${name}_morph_log.out 2>&1
+	## Everything below will go to the file '*_log.out':
+fi
 
 
 # NMT_subject_morph pipeline:
-# 0. Linearly align subject to NMT using rigid and affine transformations from NMT_subject_align
+# 0. Acquire linearly align subject to NMT from NMT_subject_align
 # 1. Non-linearly align NMT's GM cortical mask to subject
 # 2. N4 Bias Field Correction on subject volume to eliminate non-uniformities in intensity values
 # 3. Cortical thickness estimation with NMT CT mask as a prior using KellyKapowski over aligned (i.e. subject's) GM mask
 # 4. Surface area and curvature estimation using SurfaceCurvature over subject's N4-corrected volume
 # 5. Linearly transfrom all outputs back to native subject space
 
-# Linearly align subject to NMT
-
-#3dAllineate -base ../../NMT.nii.gz -source ../${name}.nii.gz -1Dmatrix_apply ../${name}_shft.1D -master ../../NMT.nii.gz -prefix tmp.nii.gz -overwrite
-#3dAllineate -base ../../NMT.nii.gz -source tmp.nii.gz -1Dmatrix_apply ../${name}_shft_al2std_mat.aff12.1D -master ../../NMT.nii.gz -prefix tmp.nii.gz -overwrite
-cat_matvec ../${name}_shft.1D ../${name}_shft_al2std_mat.aff12.1D -ONELINE > tmp_linear_align.1D
-
-3dAllineate -base ../../NMT.nii.gz -source ../${name}.nii.gz -1Dmatrix_apply tmp_linear_align.1D -prefix tmp.nii.gz -overwrite
-
 # Alignment of NMT's GM mask to subject
 
-#cat_matvec ../${name}_shft.1D -I > tmp6.1D # create temporary inverse rigid-body transformation 
-#cat_matvec ../${name}_shft_al2std_mat.aff12.1D -I > tmp12.1D # create temporary inverse affine transformation
-#cat_matvec tmp6.1D tmp12.1D > tmpcat.1D # create temporary combined inverse transformation
-3dNwarpApply -prefix ${name}_GM_cortical_mask.nii.gz ${name}_GM_cortical_mask_withWM.nii.gz ${name}_CT_prior.nii.gz -source ../../NMT_GM_cortical_mask.nii.gz ../../NMT_GM_cortical_mask_withWM.nii.gz ../../NMT_CT.nii.gz -master tmp.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
+3dNwarpApply -prefix ${name}_GM_cortical_mask.nii.gz ${name}_GM_cortical_mask_withWM.nii.gz ${name}_CT_prior.nii.gz -source ../../NMT_GM_cortical_mask.nii.gz ../../NMT_GM_cortical_mask_withWM.nii.gz ../../NMT_CT.nii.gz -master ../${name}.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
 
 # N4 intensity normalization over entire volume
 
-$ANTSPATH/N4BiasFieldCorrection -d 3 -i tmp.nii.gz -o tmp.nii.gz
+$ANTSPATH/N4BiasFieldCorrection -d 3 -i ../${name}.nii.gz -o tmp.nii.gz
 
 # Cortical thickness estimation
 
@@ -95,47 +87,29 @@ $ANTSPATH/SurfaceCurvature tmp.nii.gz ${name}_gausscurv.nii.gz 1 6
 
 # Transformation of generated masks and volumes from NMT to subject
 
-#3dNwarpApply -prefix ${name}_GM_cortical_mask.nii.gz ${name}_CT.nii.gz ${name}_SA.nii.gz ${name}_meancurv.nii.gz ${name}_gausscurv.nii.gz -master $1 -nwarp tmp6.1D -ainterp NN -overwrite
-#3dAllineate -base ../$1 -source tmp.nii.gz -1Dmatrix_apply ${name}_shft_inv.aff12.1D -master ../$1 -prefix ${name}_N4.nii.gz -overwrite
-#3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply ${name}_inv_shft.1D -final wsinc5 -prefix ${name}_N4.nii.gz -overwrite
+if [ "$space" = "ORIG" ]
+	then
+	echo "Warping results back to native space"
+	cat_matvec ../${name}_shft_inv.aff12.1D ../${name}_inv_shft.1D -ONELINE > tmp_inv_linear.1D
 
-#3dAllineate -base ../$1 -source ${name}_GM_cortical_mask.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -master ../$1 -prefix ${name}_GM_cortical_mask.nii.gz -overwrite
-#3dAllineate -base ../$1 -source ${name}_GM_cortical_mask.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_GM_cortical_mask.nii.gz -overwrite
+	3dAllineate -base ../$1 -source tmp.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -master ../$1 -prefix ${name}_N4.nii.gz -overwrite
 
-#3dAllineate -base ../$1 -source ${name}_GM_cortical_mask_withWM.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -master ../$1 -prefix ${name}_GM_cortical_mask_withWM.nii.gz -overwrite
-#3dAllineate -base ../$1 -source ${name}_GM_cortical_mask_withWM.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_GM_cortical_mask_withWM.nii.gz -overwrite
+	3dAllineate -base ../$1 -source ${name}_GM_cortical_mask.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -master ../$1 -prefix ${name}_GM_cortical_mask.nii.gz -overwrite
 
-#3dAllineate -base ../$1 -source ${name}_CT.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -master ../$1 -prefix ${name}_CT.nii.gz -overwrite
-#3dAllineate -base ../$1 -source ${name}_CT.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_CT.nii.gz -overwrite
+	3dAllineate -base ../$1 -source ${name}_GM_cortical_mask_withWM.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -master ../$1 -prefix ${name}_GM_cortical_mask_withWM.nii.gz -overwrite
 
-#3dAllineate -base ../$1 -source ${name}_SA.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -master ../$1 -prefix ${name}_SA.nii.gz -overwrite
-#3dAllineate -base ../$1 -source ${name}_SA.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_SA.nii.gz -overwrite
+	3dAllineate -base ../$1 -source ${name}_CT.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -master ../$1 -prefix ${name}_CT.nii.gz -overwrite
 
-#3dAllineate -base ../$1 -source ${name}_meancurv.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -master ../$1 -prefix ${name}_meancurv.nii.gz -overwrite
-#3dAllineate -base ../$1 -source ${name}_meancurv.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_meancurv.nii.gz -overwrite
+	3dAllineate -base ../$1 -source ${name}_SA.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -master ../$1 -prefix ${name}_SA.nii.gz -overwrite
 
-#3dAllineate -base ../$1 -source ${name}_gausscurv.nii.gz -1Dmatrix_apply ../${name}_shft_inv.aff12.1D -final NN -master ../$1 -prefix ${name}_gausscurv.nii.gz -overwrite
-#3dAllineate -base ../$1 -source ${name}_gausscurv.nii.gz -1Dmatrix_apply ../${name}_inv_shft.1D -final NN -prefix ${name}_gausscurv.nii.gz -overwrite
+	3dAllineate -base ../$1 -source ${name}_meancurv.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -master ../$1 -prefix ${name}_meancurv.nii.gz -overwrite
 
-cat_matvec ../${name}_shft_inv.aff12.1D ../${name}_inv_shft.1D -ONELINE > tmp_inv_linear.1D
-
-3dAllineate -base ../$1 -source tmp.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -master ../$1 -prefix ${name}_N4.nii.gz -overwrite
-
-3dAllineate -base ../$1 -source ${name}_GM_cortical_mask.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -master ../$1 -prefix ${name}_GM_cortical_mask.nii.gz -overwrite
-
-3dAllineate -base ../$1 -source ${name}_GM_cortical_mask_withWM.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -master ../$1 -prefix ${name}_GM_cortical_mask_withWM.nii.gz -overwrite
-
-3dAllineate -base ../$1 -source ${name}_CT.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -master ../$1 -prefix ${name}_CT.nii.gz -overwrite
-
-3dAllineate -base ../$1 -source ${name}_SA.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -master ../$1 -prefix ${name}_SA.nii.gz -overwrite
-
-3dAllineate -base ../$1 -source ${name}_meancurv.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -master ../$1 -prefix ${name}_meancurv.nii.gz -overwrite
-
-3dAllineate -base ../$1 -source ${name}_gausscurv.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -master ../$1 -prefix ${name}_gausscurv.nii.gz -overwrite
+	3dAllineate -base ../$1 -source ${name}_gausscurv.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -final NN -master ../$1 -prefix ${name}_gausscurv.nii.gz -overwrite
+	
+fi
 
 rm tmp.nii.gz
 #rm -r tmp*.1D
-
 
 
 
