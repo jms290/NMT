@@ -71,7 +71,7 @@ fi
 $ANTSPATH/N4BiasFieldCorrection -d 3 -i ../${name}_shft_aff.nii.gz -o ${name}_N4.nii.gz
 
 # Brain extraction
-if [ "$log" = ANTs ]
+if [ "$mask_gen_method" = ANTs ]
 then
 	$ANTSPATH/antsBrainExtraction.sh -d 3 -a ${name}_N4.nii.gz -e ../../NMT.nii.gz -m ../../NMT_brainmask.nii.gz -o ${name}_
 
@@ -80,7 +80,7 @@ then
 	cp ${name}_BrainExtractionMask.nii.gz ${name}_brainmask.nii.gz # change filenames 
 	rm ${name}_BrainExtractionBrain.nii.gz # remove default ANTs outputs
 	rm ${name}_BrainExtractionMask.nii.gz # remove default ANTs outputs
-elif [ "$log" = NMT_warp ]
+elif [ "$mask_gen_method" = NMT_warp ]
 then
 	3dNwarpApply -prefix ${name}_brainmask.nii.gz -source ../../NMT_brainmask.nii.gz -master ../${name}_shft_aff.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
 	3dcalc -a ${name}_N4.nii.gz -b ${name}_brainmask.nii.gz -expr 'a*b' -prefix ${name}_brain.nii.gz
@@ -108,7 +108,7 @@ rm -r ${name}_N4Truncated0.nii.gz
 # Transformation of generated masks and volumes from NMT to subject
 
 if [ "$space" = "ORIG" ]
-	then
+then
 	echo "Warping results back to native space"
 
 	cat_matvec ../${name}_shft_inv.aff12.1D ../${name}_inv_shft.1D -ONELINE > tmp_inv_linear.1D
