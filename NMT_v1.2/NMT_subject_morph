@@ -64,15 +64,15 @@ fi
 # 5. Linearly transfrom all outputs back to native subject space
 
 # 0. Acquire linearly align subject to NMT from NMT_subject_align
-3dcalc -a ../${name}_shft_al2std+orig -expr 'a' -prefix ../${name}_shft_al2std.nii.gz
+3dcalc -a ../${name}_shft_aff+orig -expr 'a' -prefix ../${name}_shft_aff.nii.gz
 
 # Alignment of NMT's GM mask to subject
 
-3dNwarpApply -prefix ${name}_GM_cortical_mask.nii.gz ${name}_GM_cortical_mask_withWM.nii.gz ${name}_CT_prior.nii.gz -source ../../NMT_GM_cortical_mask.nii.gz ../../NMT_GM_cortical_mask_withWM.nii.gz ../../NMT_CT.nii.gz -master ../${name}_shft_al2std.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
+3dNwarpApply -prefix ${name}_GM_cortical_mask.nii.gz ${name}_GM_cortical_mask_withWM.nii.gz ${name}_CT_prior.nii.gz -source ../../NMT_GM_cortical_mask.nii.gz ../../NMT_GM_cortical_mask_withWM.nii.gz ../../NMT_CT.nii.gz -master ../${name}_shft_aff.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
 
 # N4 intensity normalization over entire volume
 
-$ANTSPATH/N4BiasFieldCorrection -d 3 -i ../${name}_shft_al2std.nii.gz -o tmp.nii.gz
+$ANTSPATH/N4BiasFieldCorrection -d 3 -i ../${name}_shft_aff.nii.gz -o tmp.nii.gz
 
 # Cortical thickness estimation
 
