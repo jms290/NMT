@@ -113,7 +113,7 @@ then
 
 	cat_matvec ../${name}_shft_inv.aff12.1D ../${name}_inv_shft.1D -ONELINE > tmp_inv_linear.1D
 
-	3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -prefix ${name}_N4.nii.sgz -overwrite
+	3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -prefix ${name}_N4.nii.gz -overwrite
 
 	3dAllineate -base ../$1 -source ${name}_brain.nii.gz -1Dmatrix_apply tmp_inv_linear.1D -prefix ${name}_brain.nii.gz -overwrite
 
