@@ -62,9 +62,12 @@ fi
 # 3. 2nd N4 intensity normalization and Atropos tissue segmentation
 # 4. Rigidly transfrom all outputs back to native subject space
 
+# 0. Acquire linearly align subject to NMT from NMT_subject_align
+3dcalc -a ../${name}_shft_al2std+orig -expr 'a' -prefix ../${name}_shft_al2std.nii.gz
+
 # N4 intensity normalization over entire volume
 
-$ANTSPATH/N4BiasFieldCorrection -d 3 -i ../${name}.nii.gz -o ${name}_N4.nii.gz
+$ANTSPATH/N4BiasFieldCorrection -d 3 -i ../${name}_shft_al2std.nii.gz -o ${name}_N4.nii.gz
 
 # Brain extraction
 
