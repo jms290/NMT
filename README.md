@@ -126,6 +126,11 @@ If the brain has already been masked out from your subject (i.e., skull-stripped
 tcsh ../NMT_subject_align.csh [subject_without_skull] ../NMT.nii.gz
 ```
 
+We also provide the ability to warp the D99 atlas to your subject space through the NMT:
+```tcsh
+tcsh ../NMT_subject_align.csh [subject_without_skull] ../NMT.nii.gz ./D99_atlas_1.2a_al2NMT.nii.gz
+```
+
 NMT_subject_align provides multiple outputs to assist in registering your anatomicals and associated MRI data to the NMT:
 - Subject scan registered to the NMT
 	+ **mydset_shft+orig** - dataset center aligned to the NMT center
