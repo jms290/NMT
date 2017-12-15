@@ -10,11 +10,14 @@
 set atlas_dir = "../.."
 if ("$#" <  "2") then
    echo "usage:"
-   echo "   NMT_subject_align.csh dset template_dset"
+   echo "   NMT_subject_align.csh dset template_dset segmentation_dset"
    echo
    echo "example:"
    echo " tcsh NMT_subject_align.csh macaque1+orig \"
-   echo "   ${atlas_dir}/NMT.nii.gz \"
+   echo "   ${atlas_dir}/D99_atlas_1.2a_al2NMT.nii.gz \"
+   echo
+   echo "Note only the dset and template_dset are required. If no segmentation"
+   echo "is given, then only the alignment steps are performed."
    echo
    echo
    echo "NMT_subject_align provides multiple outputs to assist in registering your anatomicals and associated MRI data to the NMT:"
@@ -35,11 +38,8 @@ if ("$#" <  "2") then
    echo "	+ **mydset_shft_WARPINV.nii.gz** - inverse of mydset_shft_WARP.nii.gz"
    echo "	+ **mydset_composite_linear_to_NMT_inv.1D** - inverse of mydset_composite_linear_to_NMT.1D"
    echo "	+ **mydset_composite_WARP_to_NMT_inv.nii.gz** - inverse of mydset_composite_WARP_to_NMT.nii.gz"
-   echo "-NMT Aligned to Subject"
-   echo "	+ **NMT_in_mydset_native+orig** -  template transformed to native dataset space"
-   echo "	+ **NMT_in_mydset_aniso+orig** - anisotropically smoothed template ransformed to native space"
-   echo "	+ **NMT_in_mydset_aniso_clust+orig** - single cluster version of template for surfaces in native space"
-   echo "	+ **NMT_in_mydset_aniso.gii** - surface of template in native space"
+   echo "-D99 Atlas Aligned to Single Subject (Optional)"
+   echo "	+ **${segset}_in_${origdsetprefix}.nii.gz** - D99 Atlas Aligned to Single Subject"
    echo "***-NOTE: NMT_subject_align requires the AFNI software package to run correctly***"
    echo
    echo " Here all occurrences of mydset in the output file names would be replaced"
@@ -51,7 +51,11 @@ setenv AFNI_COMPRESSOR GZIP
 
 set dset = $1
 set base = $2
-set segset = ""
+if ("$#" < "3") then
+   set segset = ""
+else
+   set segset = $3
+endif
 
 # optional resample to template resolution and use that
 # set finalmaster = `@GetAfniPrefix $base`
@@ -73,7 +77,10 @@ set dset = ( $dsetprefix+*.HEAD )
 set dset = $dset[1]
 
 set origdsetprefix = $dsetprefix
-
+if ($segset != "") then
+   set segsetprefix = `@GetAfniPrefix $segset`
+   set segsetdir = `dirname $segset`
+endif
 # put the center of the dataset on top of the center of the template
 @Align_Centers -base $base -dset $dset
 
@@ -178,15 +185,37 @@ cat_matvec -ONELINE ${dsetprefix}_inv.1D ${dsetprefix}_inv_al2std_mat.aff12.1D >
 3dNwarpCat -prefix ${origdsetprefix}_composite_WARP_to_NMT_inv.nii.gz                     \
    ${dsetprefix}_WARPINV.nii.gz ${dsetprefix}_inv_al2std_mat.aff12.1D ${origdsetprefix}_shft_inv.1D
 
+ # warp segmentation from atlas back to the original macaque space
+ #  of the input dataset (compose overall warp when applying)
+ #  note - if transforming other datasets like the template
+ #    back to the same native space, it will be faster to compose
+ #    the warp separately with 3dNwarpCat or 3dNwarpCalc rather
+ #    than composing it for each 3dNwarpApply
+ if ($segset != "") then
+    3dNwarpApply -ainterp NN -short -overwrite -nwarp \
+       ${origdsetprefix}_composite_WARP_to_NMT_inv.nii.gz  -overwrite \
+       -source $segset -master ${dsetprefix}${origview} -prefix ${segset}_in_${origdsetprefix}.nii.gz
+
+    # change the datum type to byte to save space
+    # this step also gets rid of the shift transform in the header
+    3dcalc -a ${segset}_in_${origdsetprefix}.nii.gz -expr a -datum byte -nscale \
+       -overwrite -prefix ${segset}_in_${origdsetprefix}.nii.gz
+
+    # copy segmentation information from atlas to this native-space
+    #   segmentation dataset and mark to be shown with integer colormap
+    3drefit -cmap INT_CMAP ${segset}_in_${origdsetprefix}.nii.gz
+    3drefit -copytables $segset ${segset}_in_${origdsetprefix}.nii.gz
+ endif
+
 # create transformed template in this macaque's native space
 # this dataset is useful for visualization
-3dNwarpApply -overwrite -short -nwarp "${dsetprefix}_inv_al2std_mat.aff12.1D INV(${dsetprefix}_WARP.nii.gz)" \
-   -source $base -master ${dsetprefix}${origview} -prefix __tmp_${templatename}_in_${dsetprefix}_native -overwrite
-@Align_Centers -base ${finalmaster} -dset __tmp_${templatename}_in_${dsetprefix}_native${origview} -no_cp
+#3dNwarpApply -overwrite -short -nwarp "${dsetprefix}_inv_al2std_mat.aff12.1D INV(${dsetprefix}_WARP.nii.gz)" \
+#   -source $base -master ${dsetprefix}${origview} -prefix __tmp_${templatename}_in_${dsetprefix}_native -overwrite
+#@Align_Centers -base ${finalmaster} -dset __tmp_${templatename}_in_${dsetprefix}_native${origview} -no_cp
 # change the datum type to byte to save space
 # this step also gets rid of the shift transform in the header
-3dcalc -a __tmp_${templatename}_in_${dsetprefix}_native${origview} -expr a -datum byte -nscale \
-   -prefix ${templatename}_in_${origdsetprefix}_native -overwrite
+#3dcalc -a __tmp_${templatename}_in_${dsetprefix}_native${origview} -expr a -datum byte -nscale \
+#   -prefix ${templatename}_in_${origdsetprefix}_native -overwrite
 
 
 #Making quick brainmask. For more accurate brainmask, please use NMT_subject_process
@@ -197,14 +226,14 @@ cp $base ./
 # "carve" out template (D99,NMT,...) surface in native space to use as representative surface
 #  using anisotropic smoothing
 # could use skullstripped original instead
-3danisosmooth -prefix ${templatename}_in_${origdsetprefix}_aniso -3D -iters 6 \
-   -matchorig ${templatename}_in_${origdsetprefix}_native${origview}
- also remove any  small clusters for surface generation (threshold here is specific so may need tweaking)
+#3danisosmooth -prefix ${templatename}_in_${origdsetprefix}_aniso -3D -iters 6 \
+#   -matchorig ${templatename}_in_${origdsetprefix}_native${origview}
+# also remove any  small clusters for surface generation (threshold here is specific so may need tweaking)
 #3dclust -1Dformat -nosum -1dindex 0 -1tindex 0 -2thresh -57.2 57.2 \
-   -savemask ${templatename}_in_${origdsetprefix}_aniso_clust -dxyz=1 1.01 20000 \
-   ${templatename}_in_${origdsetprefix}_aniso${origview}
-IsoSurface -isorange 1 255 -overwrite -input ${templatename}_in_${origdsetprefix}_aniso_clust${origview} \
-   -o  ${templatename}_in_${origdsetprefix}_aniso.gii -overwrite -noxform -Tsmooth 0.1 20
+#   -savemask ${templatename}_in_${origdsetprefix}_aniso_clust -dxyz=1 1.01 20000 \
+#   ${templatename}_in_${origdsetprefix}_aniso${origview}
+#IsoSurface -isorange 1 255 -overwrite -input ${templatename}_in_${origdsetprefix}_aniso_clust${origview} \
+#   -o  ${templatename}_in_${origdsetprefix}_aniso.gii -overwrite -noxform -Tsmooth 0.1 20
 
 # get rid of temporary warped datasets
 rm __tmp*_${dsetprefix}*.HEAD __tmp*_${dsetprefix}*.BRIK* __tmp*_${dsetprefix}*.1D

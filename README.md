@@ -22,11 +22,7 @@ git clone http://github.com/jms290/NMT.git
 
 Otherwise, on the [NMT repository homepage](https://github.com/jms290/NMT), click the green button "clone or download"...
 
-To download the Full-head version of the NMT, which includes more peripheral tissue, download from the AFNI website [here](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/nmt/NMT_v1.2/NMT.fullhead.nii.gz)
-
-To download the nonlinear components of the D99 and F99 volumetric transformations to the NMT, download from the AFNI website [here](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/nmt/NMT_v1.2/NMT.fullhead.nii.gz)
-
-Alternatively, all files associated with the NMT (including Full-head NMT and nonlinear volumetric transformations) may be downloaded from the AFNI website [here](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/nmt/)
+Alternatively, all files associated with the NMT may be downloaded straight from the AFNI website [here](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/nmt/)
 
 
 ## NMT Files
@@ -60,6 +56,9 @@ All volume and surface files are stored in the relatively universal nifti (.nii.
 - NMT surfaces (other)
 	+ Arterial blood vasculature - **blood_vasculature.gii**
 	+ Cerebellum surface - **cerebellum.gii**
+- Common Atlases
+	+ D99 Atlas Aligned to NMT - **D99_atlas_1.2a_al2NMT.nii.gz**
+	+ F99 Transformation Parameters - **/F99_volumetric_transformations**
 
 There is also a .spec file - **NMT_both.spec**, which is a text file used by SUMA to load in each of the left and right hemisphere surfaces above.
 
@@ -117,37 +116,41 @@ NMT_subject_align provides multiple outputs to assist in registering your anatom
 	+ **mydset_shft_WARPINV.nii.gz** - inverse of mydset_shft_WARP.nii.gz
 	+ **mydset_composite_linear_to_NMT_inv.1D** - inverse of mydset_composite_linear_to_NMT.1D
 	+ **mydset_composite_WARP_to_NMT_inv.nii.gz** - inverse of mydset_composite_WARP_to_NMT.nii.gz
-- NMT Aligned to Subject
-	+ **NMT_in_mydset_native+orig** -  template transformed to native dataset space
-	+ **NMT_in_mydset_aniso+orig** - anisotropically smoothed template ransformed to native space
-	+ **NMT_in_mydset_aniso_clust+orig** - single cluster version of template for surfaces in native space
-	+ **NMT_in_mydset_aniso.gii** - surface of template in native space"
+- D99 Atlas Aligned to Single Subject (Optional)
+	+ **D99_in_mydset.nii.gz** - D99 Atlas Aligned to Single Subject
+
 ***-NOTE: NMT_subject_align requires the AFNI software package to run correctly***
 
 Data aligned to your dataset can be easily warped to the NMT using NMT_subject_align outputs and AFNI's 3dNwarpApply for nonlinearly warping:
 ```tcsh
-3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT.nii.gz -source {newdset}+orig -master ../NMT.nii.gz -prefix {newdset}_in_NMT.nii.gz
+3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT.nii.gz -source {newdset}+orig \
+-master ../NMT.nii.gz -prefix {newdset}_in_NMT.nii.gz
 ```
 
 For linear alignment to the NMT, please use AFNI's 3dAllineate and command:
 ```tcsh
-3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT.1D -source {newdset}+orig -master ../NMT.nii.gz -prefix {newdset}_in_NMT.nii.gz
+3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT.1D -source {newdset}+orig \
+-master ../NMT.nii.gz -prefix {newdset}_in_NMT.nii.gz
 ```
 
 To bring data from the NMT to your dataset, simply use the inverse transformations of the above commands:
 ```tcsh
-3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT_inv.nii.gz -source {newdset}+orig -master {mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz
+3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT_inv.nii.gz -source {newdset}+orig \
+-master {mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz
 ```
 ```tcsh
-3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT_inv.1D -source {newdset}+orig -master {mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz
+3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT_inv.1D -source {newdset}+orig \
+-master {mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz
 ```
 
 When warping atlas or mask data, add the -interp NN flag to avoid warping artifacts:
 ```tcsh
-3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT_inv.nii.gz -source {NMTdset}+orig -master {mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz -interp NN
+3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT_inv.nii.gz -source {NMTdset}+orig \
+-master {mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz -interp NN
 ```
 ```tcsh
-3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT_inv.1D -source {NMTdset}+orig -master .{mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz -interp NN
+3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT_inv.1D -source {NMTdset}+orig \
+-master .{mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz -interp NN
 ```
 
 ### NMT_subject_process
@@ -174,19 +177,28 @@ Run this script from the directory where the NMT_subject_align output lies. This
 
 If ANTs is not installed, a rough approximation of a single subject brainmask can be generated using AFNI's 3dNwarpApply:
 ```tcsh
-3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT_inv.nii.gz -source NMT_brainmask.nii.gz -master {mydset}+orig -prefix NMT_brainmask_in{mydset}.nii.gz -interp NN
+3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT_inv.nii.gz \
+-source NMT_brainmask.nii.gz -master {mydset}+orig -prefix NMT_brainmask_in{mydset}.nii.gz -interp NN
 ```
 
-## Transformations from the NMT to the F99 and D99 templates
+## Transformations from the NMT to the F99 atlas
 
-We include the rigid, affine, and diffeomorphic (non-linear) tranformations to the NMT from both the F99 and D99 templates. However, due to the size of the non-linear transformation files, we are hosting them on Google Drive. They can be downloaded from [here](  https://drive.google.com/open?id=0B07w_FBo9wpIWU5Uc3k2SWFHYWs). The D99 template and atlas can be downloaded from the AFNI website [here](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/macaqueatlas_1.2a/). An example command to align the D99 atlas to the NMT (using AFNI's 3dNwarpApply command) is provided below:
+We include the rigid, affine, and diffeomorphic (non-linear) tranformations to the NMT from the F99 template [here](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/nmt/NMT_v1.2/volumetric_transformations/). An example command to align the F99 atlas to the NMT (using AFNI's 3dNwarpApply command) is provided below:
 
 ```bash
-3dNwarpApply -nwarp 'D99_template_shft.1D D99_template_shft_al2std_mat.aff12.1D D99_template_shft_WARP.nii.gz' -source D99_atlas_1.2a.nii.gz -prefix D99_atlas_1.2a_al2NMT.nii.gz -ainterp NN -short
+3dNwarpApply -nwarp 'Macaque.F99UA1.LR.03-11_SurfVol_shft.1D \
+ Macaque.F99UA1.LR.03-11_SurfVol_shft_al2std_mat.aff12.1D \
+ Macaque.F99UA1.LR.03-11_SurfVol_shft_WARP.nii.gz' \
+ -source {F99_atlas_name}  -ainterp NN -short \
+ -master NMT.nii.gz -prefix F99_atlas_al2NMT.nii.gz
 ```
 
 To go from the NMT to the D99 simply reverse the order of the transformations and add the INV() to each transformation file:
 
 ```bash
-3dNwarpApply -nwarp 'INV(D99_template_shft_WARP.nii.gz) INV(D99_template_shft_al2std_mat.aff12.1D) INV(D99_template_shft.1D)' -source D99_atlas_1.2a_al2NMT.nii.gz -prefix D99_atlas_1.2a.nii.gz -ainterp NN -short
+3dNwarpApply -nwarp 'INV(Macaque.F99UA1.LR.03-11_SurfVol_shft_WARP.nii.gz) \
+INV(Macaque.F99UA1.LR.03-11_SurfVol_shft_al2std_mat.aff12.1D) \
+INV(Macaque.F99UA1.LR.03-11_SurfVol_shft.1D)' \
+-source NMT.nii.gz -ainterp NN -short \
+-master {F99_atlas_name} -prefix NMT_in_F99_atlas.nii.gz
 ```
