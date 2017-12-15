@@ -78,6 +78,34 @@ Toggle the "t" key to open the connection between AFNI and SUMA. You should see 
 
 Now that AFNI and SUMA are linked, this will allow you to visualize any data (i.e. overlay) from the NMT volume on the surface. Note that only the voxels which intersect the surface outlines will be plotted on the surface. As such, we suggest using the "mid" surface for the visualization of any functional MRI data. For more information about using AFNI interactively, see this [slide show](https://afni.nimh.nih.gov/pub/dist/edu/latest/afni_handouts/afni03_interactive.pdf).
 
+## Atlases in the NMT
+
+We provide the D99 atlas nonlinearly warped to the NMT. This atlas may be further warped to the single subject space (see Single-Subject Processing) or utilized in the NMT for ROI-based analyses. Use of the D99 atlas should be accompanied with the following citation:
+
+	Three-dimensional digital template atlas of the macaque brain
+	Reveley, Gruslys, Ye, Glen, Samaha, Russ, Saad, Seth, Leopold, Saleem
+	Cerebral Cortex, Aug 2016.
+
+Furthermore, we include the rigid, affine, and diffeomorphic (non-linear) tranformations to the NMT from the F99 template [here](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/nmt/NMT_v1.2/volumetric_transformations/). An example command to align the F99 atlas to the NMT (using AFNI's 3dNwarpApply command) is provided below:
+
+```bash
+3dNwarpApply -nwarp 'Macaque.F99UA1.LR.03-11_SurfVol_shft.1D \
+ Macaque.F99UA1.LR.03-11_SurfVol_shft_al2std_mat.aff12.1D \
+ Macaque.F99UA1.LR.03-11_SurfVol_shft_WARP.nii.gz' \
+ -source {F99_atlas_name}  -ainterp NN -short \
+ -master NMT.nii.gz -prefix F99_atlas_al2NMT.nii.gz
+```
+
+To go from the NMT to the D99 simply reverse the order of the transformations and add the INV() to each transformation file:
+
+```bash
+3dNwarpApply -nwarp 'INV(Macaque.F99UA1.LR.03-11_SurfVol_shft_WARP.nii.gz) \
+INV(Macaque.F99UA1.LR.03-11_SurfVol_shft_al2std_mat.aff12.1D) \
+INV(Macaque.F99UA1.LR.03-11_SurfVol_shft.1D)' \
+-source NMT.nii.gz -ainterp NN -short \
+-master {F99_atlas_name} -prefix NMT_in_F99_atlas.nii.gz
+```
+
 ## Single-Subject Processing
 
 Along with the NMT dataset, we provide scripts to automated the processing of single subjects.
@@ -179,26 +207,4 @@ If ANTs is not installed, a rough approximation of a single subject brainmask ca
 ```tcsh
 3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT_inv.nii.gz \
 -source NMT_brainmask.nii.gz -master {mydset}+orig -prefix NMT_brainmask_in{mydset}.nii.gz -interp NN
-```
-
-## Transformations from the NMT to the F99 atlas
-
-We include the rigid, affine, and diffeomorphic (non-linear) tranformations to the NMT from the F99 template [here](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/nmt/NMT_v1.2/volumetric_transformations/). An example command to align the F99 atlas to the NMT (using AFNI's 3dNwarpApply command) is provided below:
-
-```bash
-3dNwarpApply -nwarp 'Macaque.F99UA1.LR.03-11_SurfVol_shft.1D \
- Macaque.F99UA1.LR.03-11_SurfVol_shft_al2std_mat.aff12.1D \
- Macaque.F99UA1.LR.03-11_SurfVol_shft_WARP.nii.gz' \
- -source {F99_atlas_name}  -ainterp NN -short \
- -master NMT.nii.gz -prefix F99_atlas_al2NMT.nii.gz
-```
-
-To go from the NMT to the D99 simply reverse the order of the transformations and add the INV() to each transformation file:
-
-```bash
-3dNwarpApply -nwarp 'INV(Macaque.F99UA1.LR.03-11_SurfVol_shft_WARP.nii.gz) \
-INV(Macaque.F99UA1.LR.03-11_SurfVol_shft_al2std_mat.aff12.1D) \
-INV(Macaque.F99UA1.LR.03-11_SurfVol_shft.1D)' \
--source NMT.nii.gz -ainterp NN -short \
--master {F99_atlas_name} -prefix NMT_in_F99_atlas.nii.gz
 ```
