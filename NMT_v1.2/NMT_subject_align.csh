@@ -5,7 +5,8 @@
 #    NMT_subject_align.csh dset template_dset [segmentation_dset]
 #
 # example:
-#    tcsh -x NMT_subject_align.csh Puffin_3mar11_MDEFT_500um+orig
+#    tcsh -x NMT_subject_align.csh macaque1+orig \
+#	${atlas_dir}/D99_atlas_1.2a_al2NMT.nii.gz
 #
 set atlas_dir = "../.."
 if ("$#" <  "2") then
@@ -78,8 +79,14 @@ set dset = $dset[1]
 
 set origdsetprefix = $dsetprefix
 if ($segset != "") then
-   set segsetprefix = `@GetAfniPrefix $segset`
+   #set segsetprefix = `@GetAfniPrefix $segset`
    set segsetdir = `dirname $segset`
+   echo $segset |grep D99
+   if ($status == 0) then
+      set segname = D99
+   else
+      set segname = atlas
+   endif
 endif
 # put the center of the dataset on top of the center of the template
 @Align_Centers -base $base -dset $dset
@@ -97,12 +104,7 @@ echo $base |grep NMT
 if ($status == 0) then
    set templatename = NMT
 else
-   echo $base | grep NMT
-   if ($status == 0) then
-      set templatename = NMT
-   else
-      set templatename = template
-   endif
+   set templatename = template
 endif
 
 # goto apply_warps
@@ -194,17 +196,18 @@ cat_matvec -ONELINE ${dsetprefix}_inv.1D ${dsetprefix}_inv_al2std_mat.aff12.1D >
  if ($segset != "") then
     3dNwarpApply -ainterp NN -short -overwrite -nwarp \
        ${origdsetprefix}_composite_WARP_to_NMT_inv.nii.gz  -overwrite \
-       -source $segset -master ${dsetprefix}${origview} -prefix ${segset}_in_${origdsetprefix}.nii.gz
+       -source $segset -master ${origdsetprefix}${origview} -prefix ${segname}_in_${origdsetprefix}.nii.gz
 
     # change the datum type to byte to save space
     # this step also gets rid of the shift transform in the header
-    3dcalc -a ${segset}_in_${origdsetprefix}.nii.gz -expr a -datum byte -nscale \
-       -overwrite -prefix ${segset}_in_${origdsetprefix}.nii.gz
+    3dcalc -a ${segname}_in_${origdsetprefix}.nii.gz -expr a -datum byte -nscale \
+       -overwrite -prefix ${segname}_in_${origdsetprefix}.nii.gz
 
     # copy segmentation information from atlas to this native-space
     #   segmentation dataset and mark to be shown with integer colormap
-    3drefit -cmap INT_CMAP ${segset}_in_${origdsetprefix}.nii.gz
-    3drefit -copytables $segset ${segset}_in_${origdsetprefix}.nii.gz
+    3drefit -cmap INT_CMAP ${segname}_in_${origdsetprefix}.nii.gz
+    3drefit -copytables $segset ${segname}_in_${origdsetprefix}.nii.gz
+    mv ${segsetdir}/${segname}_in_${origdsetprefix}.nii.gz ./${segname}_in_${origdsetprefix}.nii.gz
  endif
 
 # create transformed template in this macaque's native space

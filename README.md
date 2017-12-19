@@ -58,7 +58,7 @@ All volume and surface files are stored in the relatively universal nifti (.nii.
 	+ Cerebellum surface - **cerebellum.gii**
 - Common Atlases
 	+ D99 Atlas Aligned to NMT - **D99_atlas_1.2a_al2NMT.nii.gz**
-	+ F99 Transformation Parameters - **/F99_volumetric_transformations**
+	+ F99 Transformation Parameters ([AFNI website](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/nmt/NMT_v1.2/volumetric_transformations/))- **/F99_volumetric_transformations**
 
 There is also a .spec file - **NMT_both.spec**, which is a text file used by SUMA to load in each of the left and right hemisphere surfaces above.
 
@@ -80,13 +80,13 @@ Now that AFNI and SUMA are linked, this will allow you to visualize any data (i.
 
 ## Atlases in the NMT
 
-We provide the D99 atlas nonlinearly warped to the NMT. This atlas may be further warped to the single subject space (see Single-Subject Processing) or utilized in the NMT for ROI-based analyses. Use of the D99 atlas should be accompanied with the following citation:
+We provide the D99 atlas nonlinearly warped to the NMT. Atlases may be further warped to the single subject space (see Single-Subject Processing) or utilized in the NMT for ROI-based analyses. Use of the D99 atlas should be accompanied with the following citation:
 
 	Three-dimensional digital template atlas of the macaque brain
 	Reveley, Gruslys, Ye, Glen, Samaha, Russ, Saad, Seth, Leopold, Saleem
 	Cerebral Cortex, Aug 2016.
 
-Furthermore, we include the rigid, affine, and diffeomorphic (non-linear) tranformations to the NMT from the F99 template [here](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/nmt/NMT_v1.2/volumetric_transformations/). An example command to align the F99 atlas to the NMT (using AFNI's 3dNwarpApply command) is provided below:
+Furthermore, we include the rigid, affine, and diffeomorphic (non-linear) tranformations to the NMT from the F99 template [here](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/nmt/NMT_v1.2/volumetric_transformations/). An example command to align the F99 atlas to the NMT (using AFNI's [3dNwarpApply](https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dNwarpApply.html) command) is provided below:
 
 ```bash
 3dNwarpApply -nwarp 'Macaque.F99UA1.LR.03-11_SurfVol_shft.1D \
@@ -126,9 +126,9 @@ If the brain has already been masked out from your subject (i.e., skull-stripped
 tcsh ../NMT_subject_align.csh [subject_without_skull] ../NMT.nii.gz
 ```
 
-We also provide the ability to warp the D99 atlas to your subject space through the NMT:
+We also provide the ability to automate the alignment of atlases through NMT_subject_align:
 ```tcsh
-tcsh ../NMT_subject_align.csh [subject_without_skull] ../NMT.nii.gz ./D99_atlas_1.2a_al2NMT.nii.gz
+tcsh ../NMT_subject_align.csh [subject] ../NMT.nii.gz ./D99_atlas_1.2a_al2NMT.nii.gz
 ```
 
 NMT_subject_align provides multiple outputs to assist in registering your anatomicals and associated MRI data to the NMT:
@@ -145,22 +145,22 @@ NMT_subject_align provides multiple outputs to assist in registering your anatom
 	+ **mydset_composite_WARP_to_NMT.nii.gz** - combined linear and nonlinear transformations to the NMT
 - Registration parameters for NMT Alignment to Subject
 	+ **mydset_shft_inv.1D** - inverse of mydset_shft.1D
-	+ **mydset_shft_al2std_mat.aff12.1D** - inverse of mydset_shft_al2std_mat.aff12.1D
+	+ **mydset_shft_inv_al2std_mat.aff12.1D** - inverse of mydset_shft_al2std_mat.aff12.1D
 	+ **mydset_shft_WARPINV.nii.gz** - inverse of mydset_shft_WARP.nii.gz
 	+ **mydset_composite_linear_to_NMT_inv.1D** - inverse of mydset_composite_linear_to_NMT.1D
 	+ **mydset_composite_WARP_to_NMT_inv.nii.gz** - inverse of mydset_composite_WARP_to_NMT.nii.gz
-- D99 Atlas Aligned to Single Subject (Optional)
-	+ **D99_in_mydset.nii.gz** - D99 Atlas Aligned to Single Subject
+- Brain Atlas Aligned to Single Subject (Optional)
+	+ **{atlas}_in_mydset.nii.gz** - D99 Atlas Aligned to Single Subject
 
 ***-NOTE: NMT_subject_align requires the AFNI software package to run correctly***
 
-Data aligned to your dataset can be easily warped to the NMT using NMT_subject_align outputs and AFNI's 3dNwarpApply for nonlinearly warping:
+Data aligned to your dataset can be easily warped to the NMT using NMT_subject_align outputs and AFNI's 3dNwarpApply:
 ```tcsh
 3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT.nii.gz -source {newdset}+orig \
 -master ../NMT.nii.gz -prefix {newdset}_in_NMT.nii.gz
 ```
 
-For linear alignment to the NMT, please use AFNI's 3dAllineate and command:
+For linear alignment to the NMT, please use AFNI's [3dAllineate](https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dAllineate.html) command:
 ```tcsh
 3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT.1D -source {newdset}+orig \
 -master ../NMT.nii.gz -prefix {newdset}_in_NMT.nii.gz
@@ -208,8 +208,20 @@ Run this script from the directory where the NMT_subject_align output lies. This
 
 ***-NOTE: NMT_subject_morph requires AFNI and [ANTs](http://stnava.github.io/ANTs/) to be installed***
 
-If ANTs is not installed, a rough approximation of a single subject brainmask can be generated using AFNI's 3dNwarpApply:
+## Troubleshooting
+#### NMT_subject_align results in poor alignment to the NMT:
+The potential causes of poor alignment are varied. The following are just a few of the potential causes of poor Alignment
+- Incorrect image orientation or pixel dimensions:
+	+ If your MRI has incorrect header labels, use AFNI's [3drefit](https://afni.nimh.nih.gov/pub/dist/doc/program_help/3drefit.html) to redefine the affected labels without modifying the underlaying data.
+- Large Field of View (FOV)
+	+ Consider cropping your MRI to better match the FOV of the NMT.
+- Field Inhomogeneities
+  + If ANTs is installed, consider running an [N4 Bias Correction](https://www.ncbi.nlm.nih.gov/pubmed/20378467) on your MRI.
+
+#### NMT_subject_process results in a inaccurately fit brainmask
+In cases when NMT_subject_process does not produce a sufficient brainmask, we recommend manually warping the NMT's brainmask to your subject using the AFNI's [3dNwarpApply](https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dNwarpApply.html) command:
 ```tcsh
-3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT_inv.nii.gz \
--source NMT_brainmask.nii.gz -master {mydset}+orig -prefix NMT_brainmask_in{mydset}.nii.gz -interp NN
+3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT_inv.nii.gz -source ../NMT_brainmask.nii.gz \
+-master {mydset}+orig -prefix NMTbrainmask_in_{mydset}.nii.gz -interp NN
 ```
+While manually warping the NMT brainmask produces an inferior brainmask compared to NMT_subject_process, we find that this method will produce an sufficient brainmask as long as the alignment in NMT_subject_align is accurate.
