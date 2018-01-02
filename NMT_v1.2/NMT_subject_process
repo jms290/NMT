@@ -117,24 +117,25 @@ rm -r ${name}_segmentation_SegmentationPosteriors*.nii.gz # remove default ANTs 
 rm -r ${name}_segmentation_ # remove default ANTs outputs
 rm -r tmp_*.nii.gz # remove temporary NMT segmentation priors
 rm -r ${name}_segmentation_Segmentation.nii.gz
+rm -r ${name}_segmentation_Segmentation0N4.nii.gz
 rm -r ${name}_N4Truncated0.nii.gz
 
 # Transformation of generated masks and volumes from NMT to subject
 
 echo "Warping results back to native space"
 
-3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply ${name}_composite_linear_to_NMT_inv.1D -prefix ${name}_N4.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -prefix ${name}_N4.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_brain.nii.gz -1Dmatrix_apply ${name}_composite_linear_to_NMT_inv.1D -prefix ${name}_brain.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_brain.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -prefix ${name}_brain.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_brainmask.nii.gz -1Dmatrix_apply ${name}_composite_linear_to_NMT_inv.1D -prefix ${name}_brainmask.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_brainmask.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -prefix ${name}_brainmask.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_segmentation.nii.gz -1Dmatrix_apply ${name}_composite_linear_to_NMT_inv.1D -final NN -prefix ${name}_segmentation.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_segmentation.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final NN -prefix ${name}_segmentation.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_segmentation_CSF.nii.gz -1Dmatrix_apply ${name}_composite_linear_to_NMT_inv.1D -final NN -prefix ${name}_segmentation_CSF.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_segmentation_CSF.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final NN -prefix ${name}_segmentation_CSF.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_segmentation_GM.nii.gz -1Dmatrix_apply ${name}_composite_linear_to_NMT_inv.1D -final NN -prefix ${name}_segmentation_GM.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_segmentation_GM.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final NN -prefix ${name}_segmentation_GM.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_segmentation_WM.nii.gz -1Dmatrix_apply ${name}_composite_linear_to_NMT_inv.1D -final NN -prefix ${name}_segmentation_WM.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_segmentation_WM.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final NN -prefix ${name}_segmentation_WM.nii.gz -overwrite
 
 rm -r tmp*.1D # remove temporary inverse warp files
