@@ -31,31 +31,32 @@ All volume and surface files are stored in the relatively universal nifti (.nii.
 
 - NMT volume (with skull) - **NMT.nii.gz**
 - NMT volume (without skull) - **NMT_SS.nii.gz**
-- NMT brain mask
-	+ NMT Binary Brainmask **NMT_brainmask.nii.gz**
-	+ NMT Probabalistic Brainmask **NMT_brainmask_prob.nii.gz**
-- NMT probabilisitic tissue segmentation masks
-	+ Gray matter - **NMT_segmentation_GM.nii.gz**
-	+ White matter - **NMT_segmentation_WM.nii.gz**
-	+ Cerebral spinal fluid - **NMT_segmentation_CSF.nii.gz**
-- NMT cortical gray matter mask - **NMT_GM_cortical_mask.nii.gz**
-- NMT cortical gray matter mask with white matter - **NMT_GM_cortical_mask_withWM.nii.gz**
-- NMT cortical cortical thickness mask - **NMT_CT.nii.gz**
-- NMT 4-tissue segmentation mask (including arterial blood vasculature) - **NMT_segmentation_4class.nii.gz**
-- NMT arterial blood vasculature - **NMT_blood_vasculature_mask.nii.gz**
-- NMT cerebellum - **NMT_cerebellum_mask.nii.gz**
-- NMT olfactory bulb - **NMT_olfactory_bulb_mask.nii.gz**
+- NMT Masks
+	- NMT brain mask
+		+ NMT Binary Brainmask **NMT_brainmask.nii.gz**
+		+ NMT Probabalistic Brainmask **NMT_brainmask_prob.nii.gz**
+	- NMT probabilisitic tissue segmentation masks
+		+ Gray matter - **NMT_segmentation_GM.nii.gz**
+		+ White matter - **NMT_segmentation_WM.nii.gz**
+		+ Cerebral spinal fluid - **NMT_segmentation_CSF.nii.gz**
+	- NMT cortical gray matter mask - **NMT_GM_cortical_mask.nii.gz**
+	- NMT cortical gray matter mask with white matter - **NMT_GM_cortical_mask_withWM.nii.gz**
+	- NMT cortical cortical thickness mask - **NMT_CT.nii.gz**
+	- NMT 4-tissue segmentation mask (including arterial blood vasculature) - **NMT_segmentation_4class.nii.gz**
+	- NMT arterial blood vasculature - **NMT_blood_vasculature_mask.nii.gz**
+	- NMT cerebellum - **NMT_cerebellum_mask.nii.gz**
+	- NMT olfactory bulb - **NMT_olfactory_bulb_mask.nii.gz**
 - NMT surfaces
 	+ Gray matter surface - **[lh or rh].GM.gii**
 	+ White matter surface - **[lh or rh].WM.gii**
 	+ Mid-cortical surface - **[lh or rh].mid.gii**
-- NMT surfaces (inflated)
-	+ Gray matter surface - **[lh or rh].GM_inflated.gii**
-	+ White matter surface - **[lh or rh].WM_inflated.gii**
-	+ Mid-cortical surface - **[lh or rh].mid_inflated.gii**
-- NMT surfaces (other)
-	+ Arterial blood vasculature - **blood_vasculature.gii**
-	+ Cerebellum surface - **cerebellum.gii**
+	- NMT surfaces (inflated)
+		+ Gray matter surface - **[lh or rh].GM_inflated.gii**
+		+ White matter surface - **[lh or rh].WM_inflated.gii**
+		+ Mid-cortical surface - **[lh or rh].mid_inflated.gii**
+	- NMT surfaces (other)
+		+ Arterial blood vasculature - **blood_vasculature.gii**
+		+ Cerebellum surface - **cerebellum.gii**
 - Common Atlases
 	+ D99 Atlas Aligned to NMT - **D99_atlas_1.2a_al2NMT.nii.gz**
 	+ F99 Transformation Parameters ([AFNI website](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/nmt/NMT_v1.2/volumetric_transformations/))- **/F99_volumetric_transformations**
@@ -209,14 +210,6 @@ Run this script from the directory where the NMT_subject_align output lies. This
 ***-NOTE: NMT_subject_morph requires AFNI and [ANTs](http://stnava.github.io/ANTs/) to be installed***
 
 ## Troubleshooting
-#### NMT_subject_align results in poor alignment to the NMT:
-The potential causes of poor alignment are varied. The following are just a few of the potential causes of poor Alignment
-- Incorrect image orientation or pixel dimensions:
-	+ If your MRI has incorrect header labels, use AFNI's [3drefit](https://afni.nimh.nih.gov/pub/dist/doc/program_help/3drefit.html) to redefine the affected labels without modifying the underlaying data.
-- Large Field of View (FOV)
-	+ Consider cropping your MRI to better match the FOV of the NMT.
-- Field Inhomogeneities
-  + If ANTs is installed, consider running an [N4 Bias Correction](https://www.ncbi.nlm.nih.gov/pubmed/20378467) on your MRI.
 
 #### NMT_subject_process results in a inaccurately fit brainmask
 In cases when NMT_subject_process does not produce a sufficient brainmask, we recommend manually warping the NMT's brainmask to your subject using the AFNI's [3dNwarpApply](https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dNwarpApply.html) command:
@@ -224,4 +217,3 @@ In cases when NMT_subject_process does not produce a sufficient brainmask, we re
 3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT_inv.nii.gz -source ../NMT_brainmask.nii.gz \
 -master {mydset}+orig -prefix NMTbrainmask_in_{mydset}.nii.gz -interp NN
 ```
-While manually warping the NMT brainmask produces an inferior brainmask compared to NMT_subject_process, we find that this method will produce an sufficient brainmask as long as the alignment in NMT_subject_align is accurate.

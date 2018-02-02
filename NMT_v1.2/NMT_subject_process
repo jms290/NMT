@@ -92,7 +92,7 @@ cd ./NMT_${name}_process
 $ANTSPATH/N4BiasFieldCorrection -d 3 -i ../${name}_shft_aff.nii.gz -o ${name}_N4.nii.gz
 #$ANTSPATH/N4BiasFieldCorrection -d 3 -i tmp.nii.gz -o ${name}_N4.nii.gz
 # Brain extraction
-$ANTSPATH/antsBrainExtraction.sh -d 3 -a ${name}_N4.nii.gz -e ../../NMT.nii.gz -m ../../NMT_brainmask_prob.nii.gz -o ${name}_
+$ANTSPATH/antsBrainExtraction.sh -d 3 -a ${name}_N4.nii.gz -e ../../NMT.nii.gz -m ../../masks/NMT_brainmask_prob.nii.gz -o ${name}_
 
 rm -r ${name}_ # remove directory that ANTs makes
 cp ${name}_BrainExtractionBrain.nii.gz ${name}_brain.nii.gz # change filenames
@@ -103,9 +103,9 @@ rm ${name}_BrainExtractionMask.nii.gz # remove default ANTs outputs
 
 # Tissue segmentation
 
-cp ../../NMT_segmentation_CSF.nii.gz tmp_01.nii.gz # create temporary NMT probabilistic segmentation files which ANTs can read as priors
-cp ../../NMT_segmentation_GM.nii.gz tmp_02.nii.gz
-cp ../../NMT_segmentation_WM.nii.gz tmp_03.nii.gz
+cp ../../masks/NMT_segmentation_CSF.nii.gz tmp_01.nii.gz # create temporary NMT probabilistic segmentation files which ANTs can read as priors
+cp ../../masks/NMT_segmentation_GM.nii.gz tmp_02.nii.gz
+cp ../../masks/NMT_segmentation_WM.nii.gz tmp_03.nii.gz
 
 $ANTSPATH/antsAtroposN4.sh -d 3 -a ${name}_N4.nii.gz -x ${name}_brainmask.nii.gz -c 3 -p tmp_%02d.nii.gz -o ${name}_segmentation_
 
@@ -126,9 +126,9 @@ echo "Warping results back to native space"
 
 3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -prefix ${name}_N4.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_brain.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -prefix ${name}_brain.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_brain.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D  -final NN -prefix ${name}_brain.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_brainmask.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -prefix ${name}_brainmask.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_brainmask.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D  -final NN -prefix ${name}_brainmask.nii.gz -overwrite
 
 3dAllineate -base ../$1 -source ${name}_segmentation.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final NN -prefix ${name}_segmentation.nii.gz -overwrite
 
