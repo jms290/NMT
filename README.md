@@ -125,17 +125,17 @@ The **NMT_subject_align script** generates the rigid (6 parameter), affine (12 p
 #### Usage
 Create a directory in single_subject_scans/ directory in the NMT distribution, and copy the scans of the individual subjects into this new directory. Run this script using a single scan as input, along with the NMT and NMT_subject_align.csh in the parent directory, as below:
 ```tcsh
-tcsh ../NMT_subject_align.csh [subject] ../../NMT.nii.gz
+tcsh ../../NMT_subject_align.csh [subject] ../../NMT.nii.gz
 ```
 If the brain has already been masked out from your subject (i.e., skull-stripped), utilize the skull-stripped version of the NMT (NMT_SS.nii.gz) as input to NMT_subject_align, as below:
 
 ```tcsh
-tcsh ../NMT_subject_align.csh [subject_without_skull] ../../NMT.nii.gz
+tcsh ../../NMT_subject_align.csh [subject_without_skull] ../../NMT.nii.gz
 ```
 
 We also provide the ability to automate the alignment of atlases through NMT_subject_align:
 ```tcsh
-tcsh ../NMT_subject_align.csh [subject] ../../NMT.nii.gz ../../D99_atlas_1.2a_al2NMT.nii.gz
+tcsh ../../NMT_subject_align.csh [subject] ../../NMT.nii.gz ../../atlases/D99_atlas/D99_atlas_1.2a_al2NMT.nii.gz
 ```
 
 NMT_subject_align provides multiple outputs to assist in registering your anatomicals and associated MRI data to the NMT:
@@ -164,13 +164,13 @@ NMT_subject_align provides multiple outputs to assist in registering your anatom
 Data aligned to your dataset can be easily warped to the NMT using NMT_subject_align outputs and AFNI's 3dNwarpApply:
 ```tcsh
 3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT.nii.gz -source {newdset}+orig \
--master ../NMT.nii.gz -prefix {newdset}_in_NMT.nii.gz
+-master ../../NMT.nii.gz -prefix {newdset}_in_NMT.nii.gz
 ```
 
 For linear alignment to the NMT, please use AFNI's [3dAllineate](https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dAllineate.html) command:
 ```tcsh
 3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT.1D -source {newdset}+orig \
--master ../NMT.nii.gz -prefix {newdset}_in_NMT.nii.gz
+-master ../../NMT.nii.gz -prefix {newdset}_in_NMT.nii.gz
 ```
 
 To bring data from the NMT to your dataset, simply use the inverse transformations of the above commands:
@@ -190,14 +190,14 @@ When warping atlas or mask data, add the -interp NN flag to avoid warping artifa
 ```
 ```tcsh
 3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT_inv.1D -source {NMTdset}+orig \
--master .{mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz -interp NN
+-master {mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz -interp NN
 ```
 
 ### NMT_subject_process
 **NMT_subject_process** performs N4 bias field correction for normalizing intensity non-uniformities, and generates a brain mask (for skull-stripping) as well as probabilistic tissue segmentation masks (GM, WM, CSF).
 #### Usage
 ```bash
-bash ../NMT_subject_process [subject]
+bash ../../NMT_subject_process [subject]
 ```
 
 Run this script from the directory where the NMT_subject_align output lies. This script will create a directory NMT_[subject]_process with the corresponding masks in the subject's anatomical space.
@@ -208,7 +208,7 @@ Run this script from the directory where the NMT_subject_align output lies. This
 **NMT_subject_morph** uses the NMT's cortical GM mask to produce volumetric maps of cortical thickness, surface area, and mean and gaussian (i.e., intrinsic) curvature.
 #### Usage
 ```bash
-bash ../NMT_subject_morph [subject]
+bash ../../NMT_subject_morph [subject]
 ```
 
 Run this script from the directory where the NMT_subject_align output lies. This script will create a directory NMT_[subject]_morph with the corresponding masks in the subject's anatomical space.
