@@ -8,7 +8,7 @@
 #    tcsh -x NMT_subject_align.csh macaque1+orig \
 #	../NMT.nii.gz 				\
 #	${atlas_dir}/D99_atlas_1.2a_al2NMT.nii.gz
-#	
+#
 set atlas_dir = "../.."
 if ("$#" <  "2") then
    echo "usage:"
@@ -16,7 +16,7 @@ if ("$#" <  "2") then
    echo
    echo "example:"
    echo " tcsh NMT_subject_align.csh macaque1+orig \"
-   echo "   ..NMT.nii.gz			  \"
+   echo "   ../NMT.nii.gz			  \"
    echo "   ${atlas_dir}/D99_atlas_1.2a_al2NMT.nii.gz"
    echo
    echo "Note only the dset and template_dset are required. If no segmentation"
