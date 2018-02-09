@@ -61,7 +61,9 @@ All volume and surface files are stored in the relatively universal nifti (.nii.
 	+ D99 Atlas Aligned to NMT - **D99_atlas_1.2a_al2NMT.nii.gz**
 	+ F99 Transformation Parameters ([AFNI website](https://afni.nimh.nih.gov/pub/dist/atlases/macaque/nmt/NMT_v1.2/volumetric_transformations/))- **/F99_volumetric_transformations**
 
-There is also a .spec file - **NMT_both.spec**, which is a text file used by SUMA to load in each of the left and right hemisphere surfaces above.
+In the surfaces folder, there is a .spec file - **NMT_both.spec**, which is a text file used by SUMA to load in each of the left and right hemisphere surfaces above.
+
+You will also find a folder called single_subject_scans/. This directory contains an example MRI script and tutorial for utilizing the NMT single-subject processing scripts (Single-Subject Processing). Folders containing your MRI scans will need to be placed in the single_subject_scans/ folder before you can properly use the single-subject processing scripts.
 
 ## Visualization in AFNI/SUMA
 
@@ -112,7 +114,9 @@ INV(Macaque.F99UA1.LR.03-11_SurfVol_shft.1D)' \
 Along with the NMT dataset, we provide scripts to automated the processing of single subjects.
 See the [paper](http://www.sciencedirect.com/science/article/pii/S105381191730383X) as well as the table in the [supplemental material](https://ars.els-cdn.com/content/image/1-s2.0-S105381191730383X-mmc1.docx) for more information. Below is the usage for each script.
 
-***-Only a reconstructed T1-weighted scan/volume is needed (either AFNI .BRIK/.HEAD or Nifti .nii or .nii.gz format)***
+For help with using the single-subject processing tools, we recommend you run our example script, align_and_process_tutorial.csh in the Example_Subject/ folder. This script will run through the NMT scripts on our Example_Subject so that you can see how the scripts should be run and the format of the output files.
+
+***-Only a reconstructed T1-weighted scan/volume is needed (either AFNI (.BRIK/.HEAD) or NIFTI (.nii or .nii.gz) format)***
 
 ### NMT_subject_align
 The **NMT_subject_align script** generates the rigid (6 parameter), affine (12 parameter), and non-linear (voxelwise) transformations to and from the NMT. The **NMT_subject_process** and **NMT_subject_morph** scripts depend on these transformations.

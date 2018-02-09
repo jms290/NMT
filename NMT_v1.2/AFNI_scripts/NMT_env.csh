@@ -2,6 +2,7 @@
 # set environment variables in AFNI's .afnirc file in the user's home directory
 # either run this script from the AFNI_scripts directory or change the ANI_SUPP_ATLAS_DIR
 # variable location
+# DO NOT MOVE THIS SCRIPT FROM THE AFNI_scripts folder.
 #usage : tcsh NMT_env.csh
 
 cd `dirname $0`

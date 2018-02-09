@@ -212,33 +212,7 @@ cat_matvec -ONELINE ${dsetprefix}_inv.1D ${dsetprefix}_inv_al2std_mat.aff12.1D >
     mv ${segsetdir}/${segname}_in_${origdsetprefix}.nii.gz ./${segname}_in_${origdsetprefix}.nii.gz
  endif
 
-# create transformed template in this macaque's native space
-# this dataset is useful for visualization
-#3dNwarpApply -overwrite -short -nwarp "${dsetprefix}_inv_al2std_mat.aff12.1D INV(${dsetprefix}_WARP.nii.gz)" \
-#   -source $base -master ${dsetprefix}${origview} -prefix __tmp_${templatename}_in_${dsetprefix}_native -overwrite
-#@Align_Centers -base ${finalmaster} -dset __tmp_${templatename}_in_${dsetprefix}_native${origview} -no_cp
-# change the datum type to byte to save space
-# this step also gets rid of the shift transform in the header
-#3dcalc -a __tmp_${templatename}_in_${dsetprefix}_native${origview} -expr a -datum byte -nscale \
-#   -prefix ${templatename}_in_${origdsetprefix}_native -overwrite
-
-
-#Making quick brainmask. For more accurate brainmask, please use NMT_subject_process
-#3dNwarpApply -prefix NMT_brainmask_in_${origdsetprefix}.nii.gz                     \
-#   -nwarp ${origdsetprefix}_composite_WARP_to_NMT_inv.nii.gz -source ../NMT_brainmask.nii.gz \
-#   -master $dset -interp NN
 cp $base ./
-# "carve" out template (D99,NMT,...) surface in native space to use as representative surface
-#  using anisotropic smoothing
-# could use skullstripped original instead
-#3danisosmooth -prefix ${templatename}_in_${origdsetprefix}_aniso -3D -iters 6 \
-#   -matchorig ${templatename}_in_${origdsetprefix}_native${origview}
-# also remove any  small clusters for surface generation (threshold here is specific so may need tweaking)
-#3dclust -1Dformat -nosum -1dindex 0 -1tindex 0 -2thresh -57.2 57.2 \
-#   -savemask ${templatename}_in_${origdsetprefix}_aniso_clust -dxyz=1 1.01 20000 \
-#   ${templatename}_in_${origdsetprefix}_aniso${origview}
-#IsoSurface -isorange 1 255 -overwrite -input ${templatename}_in_${origdsetprefix}_aniso_clust${origview} \
-#   -o  ${templatename}_in_${origdsetprefix}_aniso.gii -overwrite -noxform -Tsmooth 0.1 20
 
 # get rid of temporary warped datasets
 rm __tmp*_${dsetprefix}*.HEAD __tmp*_${dsetprefix}*.BRIK* __tmp*_${dsetprefix}*.1D

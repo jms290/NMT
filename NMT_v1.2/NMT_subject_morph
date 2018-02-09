@@ -86,7 +86,7 @@ cd ./NMT_${name}_morph
 
 # Alignment of NMT's GM mask to subject
 
-3dNwarpApply -prefix ${name}_GM_cortical_mask.nii.gz ${name}_GM_cortical_mask_withWM.nii.gz ${name}_CT_prior.nii.gz -source ../../masks/NMT_GM_cortical_mask.nii.gz ../../masks/NMT_GM_cortical_mask_withWM.nii.gz ../../masks/NMT_CT.nii.gz -master ../${name}_shft_aff.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
+3dNwarpApply -prefix ${name}_GM_cortical_mask.nii.gz ${name}_GM_cortical_mask_withWM.nii.gz ${name}_CT_prior.nii.gz -source ../../../masks/NMT_GM_cortical_mask.nii.gz ../../../masks/NMT_GM_cortical_mask_withWM.nii.gz ../../../masks/NMT_CT.nii.gz -master ../${name}_shft_aff.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
 
 # N4 intensity normalization over entire volume
 
@@ -124,4 +124,5 @@ echo "Warping results back to native space"
 3dAllineate -base ../$1 -source ${name}_gausscurv.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final NN -master ../$1 -prefix ${name}_gausscurv.nii.gz -overwrite
 
 rm tmp.nii.gz
-#rm -r tmp*.1D
+
+cd ..
