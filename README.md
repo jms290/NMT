@@ -32,20 +32,21 @@ All volume and surface files are stored in the relatively universal nifti (.nii.
 - NMT volume (with skull) - **NMT.nii.gz**
 - NMT volume (without skull) - **NMT_SS.nii.gz**
 - NMT Masks
-	- NMT brain mask
-		+ NMT Binary Brainmask **NMT_brainmask.nii.gz**
-		+ NMT Probabalistic Brainmask **NMT_brainmask_prob.nii.gz**
-	- NMT probabilisitic tissue segmentation masks
-		+ Gray matter - **NMT_segmentation_GM.nii.gz**
-		+ White matter - **NMT_segmentation_WM.nii.gz**
-		+ Cerebral spinal fluid - **NMT_segmentation_CSF.nii.gz**
-	- NMT cortical gray matter mask - **NMT_GM_cortical_mask.nii.gz**
-	- NMT cortical gray matter mask with white matter - **NMT_GM_cortical_mask_withWM.nii.gz**
-	- NMT cortical cortical thickness mask - **NMT_CT.nii.gz**
-	- NMT 4-tissue segmentation mask (including arterial blood vasculature) - **NMT_segmentation_4class.nii.gz**
-	- NMT arterial blood vasculature - **NMT_blood_vasculature_mask.nii.gz**
-	- NMT cerebellum - **NMT_cerebellum_mask.nii.gz**
-	- NMT olfactory bulb - **NMT_olfactory_bulb_mask.nii.gz**
+	+ NMT Brain Masks
+		- NMT Binary Brainmask **NMT_brainmask.nii.gz**
+		- NMT cerebellum - **NMT_cerebellum_mask.nii.gz**
+		- NMT olfactory bulb - **NMT_olfactory_bulb_mask.nii.gz**
+		- NMT arterial blood vasculature - **NMT_blood_vasculature_mask.nii.gz**
+		- NMT 4-tissue segmentation mask (including arterial blood vasculature) - **NMT_segmentation_4class.nii.gz**
+	+ NMT Probabilisitic Tissue Segmentation Masks
+		- NMT Probabilisitic Brainmask **NMT_brainmask_prob.nii.gz**
+		- Gray matter - **NMT_segmentation_GM.nii.gz**
+		- White matter - **NMT_segmentation_WM.nii.gz**
+		- Cerebral spinal fluid - **NMT_segmentation_CSF.nii.gz**
+	+ NMT Cortical Masks
+		- NMT cortical cortical thickness mask - **NMT_CT.nii.gz**
+		- NMT cortical gray matter mask - **NMT_GM_cortical_mask.nii.gz**
+		- NMT cortical gray matter mask with white matter - **NMT_GM_cortical_mask_withWM.nii.gz**
 - NMT surfaces
 	+ Gray matter surface - **[lh or rh].GM.gii**
 	+ White matter surface - **[lh or rh].WM.gii**
@@ -101,7 +102,7 @@ Furthermore, we include the rigid, affine, and diffeomorphic (non-linear) tranfo
  -master NMT.nii.gz -prefix F99_atlas_al2NMT.nii.gz
 ```
 
-To go from the NMT to the D99 simply reverse the order of the transformations and add the INV() to each transformation file:
+To go from the NMT to the F99 simply reverse the order of the transformations and add the INV() to each transformation file:
 
 ```bash
 3dNwarpApply -nwarp 'INV(Macaque.F99UA1.LR.03-11_SurfVol_shft_WARP.nii.gz) \
@@ -157,7 +158,7 @@ NMT_subject_align provides multiple outputs to assist in registering your anatom
 	+ **mydset_composite_linear_to_NMT_inv.1D** - inverse of mydset_composite_linear_to_NMT.1D
 	+ **mydset_composite_WARP_to_NMT_inv.nii.gz** - inverse of mydset_composite_WARP_to_NMT.nii.gz
 - Brain Atlas Aligned to Single Subject (Optional)
-	+ **{atlas}_in_mydset.nii.gz** - D99 Atlas Aligned to Single Subject
+	+ **{atlas}_in_mydset.nii.gz** - Specified Atlas Aligned to Single Subject
 
 ***-NOTE: NMT_subject_align requires the AFNI software package to run correctly***
 
