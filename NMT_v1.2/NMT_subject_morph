@@ -86,7 +86,7 @@ cd ./NMT_${name}_morph
 
 # Alignment of NMT's GM mask to subject
 
-3dNwarpApply -prefix ${name}_GM_cortical_mask.nii.gz ${name}_GM_cortical_mask_withWM.nii.gz ${name}_CT_prior.nii.gz -source ../../../masks/NMT_GM_cortical_mask.nii.gz ../../../masks/NMT_GM_cortical_mask_withWM.nii.gz ../../../overlays/NMT_CT.nii.gz -master ../${name}_shft_aff.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
+3dNwarpApply -prefix ${name}_GM_cortical_mask.nii.gz ${name}_GM_cortical_mask_withWM.nii.gz ${name}_CT_prior.nii.gz -source ../../../masks/NMT_GM_cortical_mask.nii.gz ../../../masks/NMT_GM_cortical_mask_withWM.nii.gz ../../../maps/NMT_CT.nii.gz -master ../${name}_shft_aff.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
 
 # N4 intensity normalization over entire volume
 

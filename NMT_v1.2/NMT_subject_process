@@ -103,9 +103,9 @@ rm ${name}_BrainExtractionMask.nii.gz # remove default ANTs outputs
 
 # Tissue segmentation
 
-cp ../../../overlays/NMT_segmentation_CSF.nii.gz tmp_01.nii.gz # create temporary NMT probabilistic segmentation files which ANTs can read as priors
-cp ../../../overlays/NMT_segmentation_GM.nii.gz tmp_02.nii.gz
-cp ../../../overlays/NMT_segmentation_WM.nii.gz tmp_03.nii.gz
+cp ../../../maps/NMT_segmentation_CSF.nii.gz tmp_01.nii.gz # create temporary NMT probabilistic segmentation files which ANTs can read as priors
+cp ../../../maps/NMT_segmentation_GM.nii.gz tmp_02.nii.gz
+cp ../../../maps/NMT_segmentation_WM.nii.gz tmp_03.nii.gz
 
 $ANTSPATH/antsAtroposN4.sh -d 3 -a ${name}_N4.nii.gz -x ${name}_brainmask.nii.gz -c 3 -p tmp_%02d.nii.gz -o ${name}_segmentation_
 
