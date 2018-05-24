@@ -74,15 +74,11 @@ cd ./NMT_${name}_morph
 
 
 # NMT_subject_morph pipeline:
-# 0. Acquire linearly align subject to NMT from NMT_subject_align
 # 1. Non-linearly align NMT's GM cortical mask to subject
 # 2. N4 Bias Field Correction on subject volume to eliminate non-uniformities in intensity values
 # 3. Cortical thickness estimation with NMT CT mask as a prior using KellyKapowski over aligned (i.e. subject's) GM mask
 # 4. Surface area and curvature estimation using SurfaceCurvature over subject's N4-corrected volume
 # 5. Linearly transfrom all outputs back to native subject space
-
-# 0. Convert Linearly aligned subject to NIFTI
-3dcalc -a ../${name}_shft_aff+orig -expr 'a' -prefix ../${name}_shft_aff.nii.gz
 
 # Alignment of NMT's GM mask to subject
 
@@ -109,7 +105,8 @@ $ANTSPATH/SurfaceCurvature tmp.nii.gz ${name}_gausscurv.nii.gz 1 6
 # Transformation of generated masks and volumes from NMT to subject
 echo "Warping results back to native space"
 
-3dAllineate -base ../$1 -source tmp.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D  -master ../$1 -prefix ${name}_N4.nii.gz -overwrite
+3dAllineate -base ../$1 -source tmp.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final wsinc5 -master ../$1 -prefix ${name}_N4.nii.gz -overwrite
+rm tmp.nii.gz
 
 3dAllineate -base ../$1 -source ${name}_GM_cortical_mask.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final NN -master ../$1 -prefix ${name}_GM_cortical_mask.nii.gz -overwrite
 
@@ -122,7 +119,5 @@ echo "Warping results back to native space"
 3dAllineate -base ../$1 -source ${name}_meancurv.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final NN -master ../$1 -prefix ${name}_meancurv.nii.gz -overwrite
 
 3dAllineate -base ../$1 -source ${name}_gausscurv.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final NN -master ../$1 -prefix ${name}_gausscurv.nii.gz -overwrite
-
-rm tmp.nii.gz
 
 cd ..

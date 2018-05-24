@@ -141,58 +141,41 @@ tcsh ../../NMT_subject_align.csh [subject] ../../NMT.nii.gz ../../atlases/D99_at
 
 NMT_subject_align provides multiple outputs to assist in registering your anatomicals and associated MRI data to the NMT:
 - Subject scan registered to the NMT
-	+ **mydset_shft+orig** - dataset center aligned to the NMT center
-	+ **mydset_shft_al2std+orig** - dataset affine aligned to the NMT
-	+ **mydset_shft_aff+orig** - dataset affine aligned to the NMT and on the NMT grid
+	+ **mydset_shft.nii.gz** - dataset center aligned to the NMT center
+	+ **mydset_shft_al2std.nii.gz** - dataset affine aligned to the NMT
+	+ **mydset_shft_aff.nii.gz** - dataset affine aligned to the NMT and on the NMT grid
 	+ **mydset_warp2std.nii.gz** - dataset nonlinearly warped to the NMT
 - Registration parameters for Alignment to NMT
-	+ **mydset_shft.1D** - transformation matrix for shift to align echo center of dataset to center of the NMT
-	+ **mydset_shft_al2std_mat.aff12.1D** - transformation matrix for affine transformation of dset to the NMT
-	+ **mydset_shft_WARP.nii.gz** - warp deformations to the NMT from nonlinear alignment only
 	+ **mydset_composite_linear_to_NMT.1D** - combined linear transformations to the NMT
-	+ **mydset_composite_WARP_to_NMT.nii.gz** - combined linear and nonlinear transformations to the NMT
+	+ **mydset_shft_WARP.nii.gz** - warp deformations to the NMT from nonlinear alignment only
 - Registration parameters for NMT Alignment to Subject
-	+ **mydset_shft_inv.1D** - inverse of mydset_shft.1D
-	+ **mydset_shft_inv_al2std_mat.aff12.1D** - inverse of mydset_shft_al2std_mat.aff12.1D
-	+ **mydset_shft_WARPINV.nii.gz** - inverse of mydset_shft_WARP.nii.gz
 	+ **mydset_composite_linear_to_NMT_inv.1D** - inverse of mydset_composite_linear_to_NMT.1D
-	+ **mydset_composite_WARP_to_NMT_inv.nii.gz** - inverse of mydset_composite_WARP_to_NMT.nii.gz
+	+ **mydset_shft_WARPINV.nii.gz** - inverse of mydset_shft_WARP.nii.gz
 - Brain Atlas Aligned to Single Subject (Optional)
-	+ **{atlas}_in_mydset.nii.gz** - Specified Atlas Aligned to Single Subject
+	+ **{atlas}_in_mydset.nii.gz** - Specified Atlas or Mask Aligned to Single Subject
 
 ***-NOTE: NMT_subject_align requires the AFNI software package to run correctly***
 
-Data aligned to your dataset can be easily warped to the NMT using NMT_subject_align outputs and AFNI's 3dNwarpApply:
+Data aligned to your dataset can be easily warped to the NMT using NMT_subject_align outputs and AFNI's 3dNwarpApply and AFNI's 3dAllineate:
 ```tcsh
-3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT.nii.gz -source {newdset}+orig \
--master ../../NMT.nii.gz -prefix {newdset}_in_NMT.nii.gz
-```
-
-For linear alignment to the NMT, please use AFNI's [3dAllineate](https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dAllineate.html) command:
-```tcsh
-3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT.1D -source {newdset}+orig \
--master ../../NMT.nii.gz -prefix {newdset}_in_NMT.nii.gz
+3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT.1D \
+	-source {newdset}+orig -master ../../NMT.nii.gz -final wsinc5 \
+	-prefix {newdset}_in_NMT_aff.nii.gz
+3dNwarpApply -nwarp {mydset}_shft_WARP.nii.gz -source {newdset}_in_NMT_aff.nii.gz \
+	-master ../../NMT.nii.gz -ainterp wsinc5 -prefix {newdset}_in_NMT.nii.gz
 ```
 
 To bring data from the NMT to your dataset, simply use the inverse transformations of the above commands:
 ```tcsh
-3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT_inv.nii.gz -source {newdset}+orig \
--master {mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz
+3dNwarpApply -nwarp {mydset}_shft_WARPINV.nii.gz -source {newdset}+orig \
+-master {mydset}+orig -prefix {NMTdset}_in_{mydset}_nl.nii.gz
 ```
 ```tcsh
-3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT_inv.1D -source {newdset}+orig \
+3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT_inv.1D -source {NMTdset}_in_{mydset}_nl.nii.gz \
 -master {mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz
 ```
 
-When warping atlas or mask data, add the -interp NN flag to avoid warping artifacts:
-```tcsh
-3dNwarpApply -nwarp {mydset}_composite_WARP_to_NMT_inv.nii.gz -source {NMTdset}+orig \
--master {mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz -interp NN
-```
-```tcsh
-3dAllineate -1Dmatrix_apply {mydset}_composite_linear_to_NMT_inv.1D -source {NMTdset}+orig \
--master {mydset}+orig -prefix {NMTdset}_in_{mydset}.nii.gz -interp NN
-```
+When warping atlas or mask data, add the -ainterp NN flag to avoid warping artifacts.
 
 ### NMT_subject_process
 **NMT_subject_process** performs N4 bias field correction for normalizing intensity non-uniformities, and generates a brain mask (for skull-stripping) as well as probabilistic tissue segmentation masks (GM, WM, CSF).
