@@ -76,36 +76,35 @@ cd ./NMT_${name}_process
 
 
 # NMT_subject_process pipeline:
-# 0. Acquire linearly align subject to NMT from NMT_subject_align
 # 1. 1st N4 intensity normalization over entire volume
-# 2. Brain extraction using antsBrainExtraction.sh
-# 3. 2nd N4 intensity normalization and Atropos tissue segmentation
-# 4. Rigidly transfrom all outputs back to native subject space
-
-# 0. Acquire linearly align subject to NMT from NMT_subject_align
-3dcalc -a ../${name}_shft_aff+orig -expr 'a' -prefix ../${name}_shft_aff.nii.gz
-#3dAllineate -base ../../NMT.nii.gz -source ../${name}.nii.gz -1Dmatrix_apply ../${name}_shft.1D -prefix tmp.nii.gz -overwrite
-#3dAllineate -base ../../NMT.nii.gz -source tmp.nii.gz -1Dmatrix_apply ../${name}_shft_al2std_mat.aff12.1D -prefix tmp.nii.gz -overwrite
+# 2. Warp NMT and Brainmask to linearly aligned volume.
+# 3. Brain extraction using antsBrainExtraction.sh
+# 4. 2nd N4 intensity normalization and Atropos tissue segmentation
+# 5. Rigidly transfrom all outputs back to native subject space
 
 # N4 intensity normalization over entire volume
-
 $ANTSPATH/N4BiasFieldCorrection -d 3 -i ../${name}_shft_aff.nii.gz -o ${name}_N4.nii.gz
-#$ANTSPATH/N4BiasFieldCorrection -d 3 -i tmp.nii.gz -o ${name}_N4.nii.gz
-# Brain extraction
-$ANTSPATH/antsBrainExtraction.sh -d 3 -a ${name}_N4.nii.gz -e ../../../NMT.nii.gz -m ../../../masks/probabilisitic_segmentation_masks/NMT_brainmask_prob.nii.gz -o ${name}_
 
+
+# Alignment of NMT's masks to subject for antsBrainExtraction.sh and Atropos (Not strictly necessary, but we've already calculated registration, so this reduces computations and is found to help results)
+
+3dNwarpApply -prefix ${name}_NMT_prior.nii.gz ${name}_NMT_brainmask_prob_prior.nii.gz ${name}_NMT_brainmask_prior.nii.gz tmp_01.nii.gz tmp_02.nii.gz tmp_03.nii.gz \
+	-source ../../../NMT.nii.gz ../../../masks/probabilisitic_segmentation_masks/NMT_brainmask_prob.nii.gz ../../../masks/anatomical_masks/NMT_brainmask.nii.gz ../../../masks/probabilisitic_segmentation_masks/NMT_segmentation_CSF.nii.gz \
+	../../../masks/probabilisitic_segmentation_masks/NMT_segmentation_GM.nii.gz ../../../masks/probabilisitic_segmentation_masks/NMT_segmentation_WM.nii.gz \
+	-master ../${name}_shft_aff.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
+
+# Brain extraction
+$ANTSPATH/antsBrainExtraction.sh -d 3 -a ${name}_N4.nii.gz -e ${name}_NMT_prior.nii.gz -m ${name}_NMT_brainmask_prob_prior.nii.gz -o ${name}_ -f ${name}_NMT_brainmask_prior.nii.gz
+
+rm ${name}_NMT_prior.nii.gz 
+rm ${name}_NMT_brainmask_prior.nii.gz
 rm -r ${name}_ # remove directory that ANTs makes
-cp ${name}_BrainExtractionBrain.nii.gz ${name}_brain.nii.gz # change filenames
-cp ${name}_BrainExtractionMask.nii.gz ${name}_brainmask.nii.gz # change filenames
-rm ${name}_BrainExtractionBrain.nii.gz # remove default ANTs outputs
-rm ${name}_BrainExtractionMask.nii.gz # remove default ANTs outputs
+mv ${name}_BrainExtractionBrain.nii.gz ${name}_brain.nii.gz # change filenames
+mv ${name}_BrainExtractionMask.nii.gz ${name}_brainmask.nii.gz # change filenames
+rm *prior.nii.gz #Remove priors used to aid antsBrainExtraction
 
 
 # Tissue segmentation
-
-cp ../../../masks/probabilisitic_segmentation_masks/NMT_segmentation_CSF.nii.gz tmp_01.nii.gz # create temporary NMT probabilistic segmentation files which ANTs can read as priors
-cp ../../../masks/probabilisitic_segmentation_masks/NMT_segmentation_GM.nii.gz tmp_02.nii.gz
-cp ../../../masks/probabilisitic_segmentation_masks/NMT_segmentation_WM.nii.gz tmp_03.nii.gz
 
 $ANTSPATH/antsAtroposN4.sh -d 3 -a ${name}_N4.nii.gz -x ${name}_brainmask.nii.gz -c 3 -p tmp_%02d.nii.gz -o ${name}_segmentation_
 
@@ -124,9 +123,9 @@ rm -r ${name}_N4Truncated0.nii.gz
 
 echo "Warping results back to native space"
 
-3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -prefix ${name}_N4.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_N4.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final wsinc5 -prefix ${name}_N4.nii.gz -overwrite
 
-3dAllineate -base ../$1 -source ${name}_brain.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D  -final NN -prefix ${name}_brain.nii.gz -overwrite
+3dAllineate -base ../$1 -source ${name}_brain.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final wsinc5 -prefix ${name}_brain.nii.gz -overwrite
 
 3dAllineate -base ../$1 -source ${name}_brainmask.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D  -final NN -prefix ${name}_brainmask.nii.gz -overwrite
 
@@ -137,7 +136,5 @@ echo "Warping results back to native space"
 3dAllineate -base ../$1 -source ${name}_segmentation_GM.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final NN -prefix ${name}_segmentation_GM.nii.gz -overwrite
 
 3dAllineate -base ../$1 -source ${name}_segmentation_WM.nii.gz -1Dmatrix_apply ../${name}_composite_linear_to_NMT_inv.1D -final NN -prefix ${name}_segmentation_WM.nii.gz -overwrite
-
-rm -r tmp*.1D # remove temporary inverse warp files
 
 cd ..
