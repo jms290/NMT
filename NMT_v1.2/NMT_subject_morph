@@ -10,10 +10,7 @@
 #		AFNI
 #		Outputs of NMT_subject_align.csh
 #
-# nb:
-#		This script should be copied to the directory where the subject's
-#		anatomical volume lies --> which should be the directory of
-#		the output of NMT_subject_align
+
 
 
 # Assign the variable ANTSPATH where the ANTs installation lies
@@ -31,25 +28,22 @@ if [ "$#" == "0" ]; then
 	echo "  example: "
 	echo " 		../NMT_subject_morph macaque1+orig "
 	echo "  "
-	echo "  nb:  "
-	echo " 		This script should be copied to the directory where the subject's  "
-	echo " 		anatomical volume lies --> which should be the directory of  "
-	echo " 		the output of NMT_subject_align  "
 	exit
 fi
 
 # Extract name from subject volume file
+NMT_loc="$(cd "$(dirname "$0")" && pwd)"
 name=$1
 name=$(basename $name)
 if [ "${name#*+*.}" = "HEAD" ] || [ "${name#*+*.}" = "BRIK" ]
 	then
-	echo "Converting ${name} to ${name[*]%+*.*}.nii.gz"
-	3dcalc -a $name -expr 'a' -prefix ${name[*]%+*.*}.nii.gz -overwrite # Convert to nifti if needed
-	name=${name[*]%+*.*}
+	echo "Converting ${name} to ${name%.*.*}.nii.gz"
+	3dcalc -a $name -expr 'a' -prefix ${name%.*.*}.nii.gz -overwrite # Convert to nifti if needed
+	name=${name%.*.*}
 fi
 if [ "${name#*.}" = "nii.gz" ]
 	then
-	name=${name[*]%.*.*}
+	name=${name%.*.*}
 fi
 if [ "${name#*.}" = "nii" ]
 	then
@@ -82,7 +76,7 @@ cd ./NMT_${name}_morph
 
 # Alignment of NMT's GM mask to subject
 
-3dNwarpApply -prefix ${name}_GM_cortical_mask.nii.gz ${name}_GM_cortical_mask_withWM.nii.gz ${name}_CT_prior.nii.gz -source ../../../masks/cortical_masks/NMT_GM_cortical_mask.nii.gz ../../../masks/cortical_masks/NMT_GM_cortical_mask_withWM.nii.gz ../../../masks/cortical_masks/NMT_CT.nii.gz -master ../${name}_shft_aff.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
+3dNwarpApply -prefix ${name}_GM_cortical_mask.nii.gz ${name}_GM_cortical_mask_withWM.nii.gz ${name}_CT_prior.nii.gz -source ${NMT_loc}/masks/cortical_masks/NMT_GM_cortical_mask.nii.gz ${NMT_loc}/masks/cortical_masks/NMT_GM_cortical_mask_withWM.nii.gz ${NMT_loc}/masks/cortical_masks/NMT_CT.nii.gz -master ../${name}_shft_aff.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
 
 # N4 intensity normalization over entire volume
 

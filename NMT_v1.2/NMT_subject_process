@@ -3,7 +3,7 @@
 # for individual subjects using the NMT priors
 #
 # usage:
-#       NMT_subject_process [subject volume] [log=0/1]
+#       NMT_subject_process [subject volume]
 #
 # dependencies:
 #		ANTs
@@ -13,10 +13,6 @@
 # example:
 #		../NMT_subject_process macaque1+orig
 #
-# nb:
-#		This script should be copied to the directory where the subject's
-#		anatomical volume lies --> which should be the directory of
-#		the output of NMT_subject_align
 
 
 # Assign the variable ANTSPATH where the ANTs installation lies
@@ -35,28 +31,27 @@ if [ "$#" == "0" ]; then
 	echo " 		../NMT_subject_process macaque1+orig "
 	echo "  "
 	echo "  nb:  "
-	echo " 		This script should be copied to the directory where the subject's  "
-	echo " 		anatomical volume lies --> which should be the directory of  "
-	echo " 		the output of NMT_subject_align  "
+	echo " 		The antsBrainExtraction option will attempt to use antsBrainExtraction to"
+	echo " 		improve the brain masking process. This process will not always work, in which"
+	echo " 		case it is recommended that this step is bypassed"
 	exit
 fi
 
 # Extract name from subject volume file
+NMT_loc="$(cd "$(dirname "$0")" && pwd)"
 name=$1
 name=$(basename $name)
 if [ "${name#*+*.}" = "HEAD" ] || [ "${name#*+*.}" = "BRIK" ]
 	then
-	echo "Converting ${name} to ${name[*]%+*.*}.nii.gz"
-	3dcalc -a $name -expr 'a' -prefix ${name[*]%+*.*}.nii.gz -overwrite # Convert to nifti if needed
-	name=${name[*]%+*.*}
+	echo "Converting ${name} to ${name%+*.*}.nii.gz"
+	3dcalc -a $name -expr 'a' -prefix ${name%+*.*}.nii.gz -overwrite # Convert to nifti if needed
+	name=${name%+*.*}
 fi
-if [ "${name#*.}" = "nii.gz" ]
-	then
-	name=${name[*]%.*.*}
+if [ "${name#*.}" = "nii.gz" ]; then
+	name=${name%.*.*}
 fi
-if [ "${name#*.}" = "nii" ]
-	then
-	name=${name[*]%.*}
+if [ "${name#*.}" = "nii" ]; then
+	name=${name%.*}
 fi
 
 # Make an output directory of NMT_subject_process for the subject
@@ -76,28 +71,26 @@ cd ./NMT_${name}_process
 
 
 # NMT_subject_process pipeline:
-# 1. 1st N4 intensity normalization over entire volume
-# 2. Warp NMT and Brainmask to linearly aligned volume.
+# 1. Warp NMT and Brainmask to linearly aligned volume.
+# 2. 1st N4 intensity normalization over entire volume
 # 3. Brain extraction using antsBrainExtraction.sh
 # 4. 2nd N4 intensity normalization and Atropos tissue segmentation
 # 5. Rigidly transfrom all outputs back to native subject space
 
-# N4 intensity normalization over entire volume
-$ANTSPATH/N4BiasFieldCorrection -d 3 -i ../${name}_shft_aff.nii.gz -o ${name}_N4.nii.gz
-
-
 # Alignment of NMT's masks to subject for antsBrainExtraction.sh and Atropos (Not strictly necessary, but we've already calculated registration, so this reduces computations and is found to help results)
 
 3dNwarpApply -prefix ${name}_NMT_prior.nii.gz ${name}_NMT_brainmask_prob_prior.nii.gz ${name}_NMT_brainmask_prior.nii.gz tmp_01.nii.gz tmp_02.nii.gz tmp_03.nii.gz \
-	-source ../../../NMT.nii.gz ../../../masks/probabilisitic_segmentation_masks/NMT_brainmask_prob.nii.gz ../../../masks/anatomical_masks/NMT_brainmask.nii.gz ../../../masks/probabilisitic_segmentation_masks/NMT_segmentation_CSF.nii.gz \
-	../../../masks/probabilisitic_segmentation_masks/NMT_segmentation_GM.nii.gz ../../../masks/probabilisitic_segmentation_masks/NMT_segmentation_WM.nii.gz \
+	-source ${NMT_loc}/NMT.nii.gz ${NMT_loc}/masks/probabilisitic_segmentation_masks/NMT_brainmask_prob.nii.gz ${NMT_loc}/masks/anatomical_masks/NMT_brainmask.nii.gz ${NMT_loc}/masks/probabilisitic_segmentation_masks/NMT_segmentation_CSF.nii.gz \
+	${NMT_loc}/masks/probabilisitic_segmentation_masks/NMT_segmentation_GM.nii.gz ${NMT_loc}/masks/probabilisitic_segmentation_masks/NMT_segmentation_WM.nii.gz \
 	-master ../${name}_shft_aff.nii.gz -nwarp ../${name}_shft_WARPINV.nii.gz -ainterp NN -overwrite
 
-# Brain extraction
-$ANTSPATH/antsBrainExtraction.sh -d 3 -a ${name}_N4.nii.gz -e ${name}_NMT_prior.nii.gz -m ${name}_NMT_brainmask_prob_prior.nii.gz -o ${name}_ -f ${name}_NMT_brainmask_prior.nii.gz
+# N4 intensity normalization over initial brainmask
+$ANTSPATH/N4BiasFieldCorrection -d 3 -i ../${name}_shft_aff.nii.gz -o ${name}_N4.nii.gz -x ${name}_NMT_brainmask_prior.nii.gz
 
-rm ${name}_NMT_prior.nii.gz 
-rm ${name}_NMT_brainmask_prior.nii.gz
+
+# Improve brain extraction using antsBrainExtraction
+$ANTSPATH/antsBrainExtraction.sh -d 3 -a ${name}_N4.nii.gz -e ${name}_NMT_prior.nii.gz \
+-m ${name}_NMT_brainmask_prob_prior.nii.gz -o ${name}_ -f ${name}_NMT_brainmask_prior.nii.gz
 rm -r ${name}_ # remove directory that ANTs makes
 mv ${name}_BrainExtractionBrain.nii.gz ${name}_brain.nii.gz # change filenames
 mv ${name}_BrainExtractionMask.nii.gz ${name}_brainmask.nii.gz # change filenames

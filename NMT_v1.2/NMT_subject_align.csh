@@ -1,5 +1,5 @@
 #!/bin/tcsh
-# affine alignment of individual dataset to NMT/any template
+# affine alignment of individual dataset to D99/NMT/any template
 #
 # usage:
 #    NMT_subject_align.csh dset template_dset [segmentation_dset]
@@ -195,7 +195,7 @@ cat_matvec -ONELINE ${dsetprefix}_inv.1D ${dsetprefix}_inv_al2std_mat.aff12.1D >
  if ($segset != "") then
     3dNwarpApply -ainterp NN -short -overwrite -nwarp \
        ${dsetprefix}_WARPINV.nii.gz  -overwrite \
-       -source $segset -master ${dsetprefix}.nii.gz -prefix ${segname}_in_${origdsetprefix}_nl.nii.gz
+       -source $segset -master ${dsetprefix}_aff.nii.gz -prefix ${segname}_in_${origdsetprefix}_nl.nii.gz
     3dAllineate -source ${segname}_in_${origdsetprefix}_nl.nii.gz -base ${origdsetprefix}.nii.gz \
     	-final NN -1Dmatrix_apply ${origdsetprefix}_composite_linear_to_NMT_inv.1D -prefix ${segname}_in_${origdsetprefix}.nii.gz
     rm ${segname}_in_${origdsetprefix}_nl.nii.gz
