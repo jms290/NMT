@@ -1,0 +1,34 @@
+<TEMPLATE_SPACE
+  space_name="NMT"
+  generic_space="NMT"
+  comment="The origin of the NIMH Macaque Template runs through the dorsal-most point of the anterior commissure and the ventral-most point of the posterior commissure, with the origin at the center of the AC"
+></TEMPLATE_SPACE>
+
+<TEMPLATE
+   template_name="NMT"
+   dset_name="NMT.nii.gz"
+   template_space="NMT"
+   description="In vivo population-average NIMH Macaque Template"
+></TEMPLATE>
+
+<ATLAS
+  atlas_name="D99_atlas"
+  dset_name="./D99_atlas_1.2a_al2NMT.nii.gz"
+  template_space="NMT"
+  description="D99 Saleem macaque atlas with supplemental info aligned to the NIMH Macaque Template"
+  supp_web_info_old = "file://localhost/home/dglen/macaqueatlas/html/macaque/ROI_"
+  supp_web_info = "http://afni.nimh.nih.gov/pub/dist/atlases/macaque/saleem/html/macaque/ROI_"
+  supp_web_type = ".html"
+  supp_conn_info_old = "file://localhost/home/dglen/macaqueatlas/html/macaque/ROI_"
+  supp_conn_type = "_connections.html"
+  supp_conn_info = "http://afni.nimh.nih.gov/pub/dist/atlases/macaque/saleem/html/macaque/ROI_"
+  comment="The segmentation was extracted from the smoothed labels of the D99 template
+          Please cite:
+          Three-dimensional digital template atlas of the macaque brain
+          Reveley, Gruslys, Ye, Samaha, Glen, Russ, Saad, Seth, Leopold, Saleem
+          Cerebral Cortex, 2016, in press
+          Note the atlas dataset may not be modified or redistributed without prior
+          consent from the authors.
+          Please contact glend@mail.nih.gov or saleemks@mail.nih.gov with questions,
+          comments and suggestions."
+>
