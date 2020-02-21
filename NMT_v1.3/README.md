@@ -37,8 +37,10 @@ Alternatively, all files associated with the NMT may be downloaded straight from
 ------------------
 
 ## NMT_v1.3 Changelog
-
-- NMT voxel values have been rescaled and capped to fit within the short datatype. 
+NMT_v1.31
+- Added -o option to NMT_subject_pipeline to manually specify output directory
+NMT_v1.3
+- NMT voxel values have been rescaled and capped to fit within the short datatype.
 - NMT files and processing outputs are now properly labeled as being in NMT space
 - Modified NMT processing scripts, and added new wrapper pipeline (NMT_subject_pipeline)
 - Converted all integer-based NMT volumes from float to short datatype.

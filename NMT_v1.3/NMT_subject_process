@@ -101,7 +101,7 @@ mkdir NMT_${name}_process
 cd ./NMT_${name}_process
 
 # N4 intensity normalization over initial brainmask
-N4BiasFieldCorrection -d 3 -i ../${name}_affine.nii.gz -o ${name}_N4.nii.gz -x ${name}_NMT_brainmask_prior.nii.gz
+$ANTSPATH/N4BiasFieldCorrection -d 3 -i ../${name}_affine.nii.gz -o ${name}_N4.nii.gz -x ${name}_NMT_brainmask_prior.nii.gz
 
 if [ ${run_brain_extraction} == "1" ]; then
 	# Improve brain extraction using antsBrainExtraction
@@ -121,7 +121,7 @@ rm ${name}_NMT_prior.nii.gz
 rm ${name}_NMT_brainmask_prob_prior.nii.gz
 
 # Tissue segmentation
-antsAtroposN4.sh -d 3 -a ${name}_N4.nii.gz -x ${name}_brainmask.nii.gz -c 3 -p tmp_%02d.nii.gz -o ${name}_segmentation_
+$ANTSPATH/antsAtroposN4.sh -d 3 -a ${name}_N4.nii.gz -x ${name}_brainmask.nii.gz -c 3 -p tmp_%02d.nii.gz -o ${name}_segmentation_
 
 cp ${name}_segmentation_SegmentationPosteriors01.nii.gz ${name}_segmentation_CSF.nii.gz # change filenames
 cp ${name}_segmentation_SegmentationPosteriors02.nii.gz ${name}_segmentation_GM.nii.gz # change filenames

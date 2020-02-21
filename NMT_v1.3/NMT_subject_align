@@ -4,15 +4,15 @@ function Help {
     cat <<HELP
 Linear and nonlinear alignment of individual datato the NMT
 
-Usage:   
+Usage:
       NMT_subject_align -i [input_dataset] -r [template_dset] <other options>
 
 	where:
 		input_dataset = the path of your volume in its original space.
 		template_dset = the path of the template that you wish to align your data to.
-	optional_arguments:	
+	optional_arguments:
 		-a [segmentation/atlas_dset]: Warps a provided segmentation or atlas to the native space of the input_dataset
-		-w [0 - 9]: By default, the nonlinear aspect of the alignment has the auto_warp.py flag, "workhard" activated 
+		-w [0 - 9]: By default, the nonlinear aspect of the alignment has the auto_warp.py flag, "workhard" activated
 			for iterations 0 - 2. The number of iterations that will workhard can be modified here for 0 - n iterations.
 			Increasing this number will increase processing time. (Default = 2)
 
@@ -294,7 +294,7 @@ if [ ! -z "$segset" ]; then
     echo "============================================================="
  fi
 
-cp $base ./
+#cp $base ./
 
 # get rid of temporary warped datasets
 rm __tmp*_${dsetprefix}*.HEAD __tmp*_${dsetprefix}*.BRIK* __tmp*_${dsetprefix}*.1D
@@ -303,7 +303,7 @@ rm __tmp*_${dsetprefix}*.HEAD __tmp*_${dsetprefix}*.BRIK* __tmp*_${dsetprefix}*.
 #rm *_aff_mat.aff12.1D
 
 #NMT_subject_align.csh log
-echo "${base}" >> .log.txt
+#cho "${base}" >> .log.txt
 # notes
 
 # warp the transformed macaque back to its original space

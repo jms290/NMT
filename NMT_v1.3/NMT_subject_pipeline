@@ -5,24 +5,25 @@ function Help {
 Runs all of the NMT processing scripts. Resulting in alignment, skullstripping, segmentation, and
 morphometrics for a given dsetume.
 
-Usage:   
-      NMT_subject_pipeline -i [input_dataset] -r [template_dset] <other options>
+Usage:
+      NMT_subject_pipeline -i [input_dataset] -o [output_directory] -r [template_dset] <other options>
 
 	where:
-		input_dataset = the path of your dsetume in its original space.
+		input_dataset = the path of your dset in its original space.
+    output_directory = the path where all of your output files will be stored
 		template_dset = the path of the template that you wish to align your data to.
-	optional_arguments:	
-		-a [segmentation/atlas_dset]: Warps a provided segmentation or atlas 
+	optional_arguments:
+		-a [segmentation/atlas_dset]: Warps a provided segmentation or atlas
 		     to the native space of the input_dataset
-		-w [0*/1]: If 1, NMT_subject_align will "workhard" and spend extra time on the 
-		     nonlinear alignment to improve results. Will significantly increase 
+		-w [0*/1]: If 1, NMT_subject_align will "workhard" and spend extra time on the
+		     nonlinear alignment to improve results. Will significantly increase
 		     computational resources and time needed. (Default = 0)
 		-b [1*/0]: If 1, runs antsBrainExtraction during NMT_subject_process (default)
-		     If 0, warps the NMT brainmask back to the native subject. 
+		     If 0, warps the NMT brainmask back to the native subject.
 		     Simplier, but more reliable results.
 
 Example:
-   bash NMT_subject_pipeline -i macaque1+orig -r ../NMT.nii.gz
+   bash NMT_subject_pipeline -i macaque1+orig -o single_subject_scans/macaque1/ -r ../NMT.nii.gz
 
 Dependencies:
 		AFNI
@@ -34,7 +35,8 @@ HELP
 segmentation=""
 workhard=2
 antsbrainextract=1
-while getopts "h:i:r:a:w:b:" OPT
+
+while getopts "h:i:r:a:w:b:o:" OPT
   do
   case $OPT in
 
@@ -45,6 +47,9 @@ while getopts "h:i:r:a:w:b:" OPT
       i) #input
 	  dset=$OPTARG
 	  ;;
+      o) #outdir
+    outdir=$OPTARG
+    ;;
       r) #reference
 	  template_dset=$OPTARG
 	  ;;
@@ -64,12 +69,17 @@ while getopts "h:i:r:a:w:b:" OPT
   esac
 done
 if [ -z "$dset" ]; then
+    echo "Requires source volume"
 	  Help >&2
 	  exit 1
 fi
 if [ -z "$template_dset" ]; then
+    echo "Requires target volume"
 	  Help >&2
 	  exit 1
+fi
+if [ -z "$outdir" ]; then
+	  outdir=$(dirname ${template_dset})/single_subject_scans/$(basename ${dset})
 fi
 
 NMT_loc="$(cd "$(dirname "$0")" && pwd)"
@@ -78,43 +88,29 @@ pref=$(@GetAfniPrefix $dset)
 pref=$(basename $pref .gz)
 pref=$(basename $pref .nii)
 
+
+
 #template_pref=$(@GetAfniPrefix $template_dset)
 #template_pref=$(basename $template_pref .gz)
 #template_pref=$(basename $template_pref .nii)
 template_dir=$(dirname ${template_dset})
-echo "	1) Change your current directory to ${template_dir}/single_subject_scans/${pref}/ "
-	cp ${dset} ${template_dir}/tmp_$(basename ${dset})
+echo "	1) Change your current directory to ${outdir} "
+  if [ ! -d ${outdir} ]; then
+    mkdir -p ${outdir}
+  fi
+
+	cp ${dset} ${outdir}/$(basename ${dset})
+  dset=$(basename ${dset})
+
 	if [ ! -z "$segmentation" ]; then
-		cp ${segmentation} ${template_dir}/tmp_$(basename ${segmentation})
-	fi
-	cd ${template_dir}
-
-	if [ ! -d single_subject_scans/ ]; then
-		mkdir single_subject_scans/
+		cp ${segmentation} ${outdir}/$(basename ${segmentation})
+    segmentation=$(basename ${segmentation})
 	fi
 
-	cd single_subject_scans/
+  cp ${template_dset} ${outdir}/$(basename ${template_dset})
+  template_dset=$(basename ${template_dset})
 
-	if [ ! -d ${pref} ]; then
-		mkdir ${pref}/
-	else
-		echo "ERROR: Scan directory already exists."
-		echo "Please move conflicting directory or change your file name."
-		exit
-	fi
-
-	cd ..
-
-	dset=$(basename ${dset})
-	cp tmp_${dset} single_subject_scans/${pref}/${dset}
-	rm tmp_${dset}
-	if [ ! -z "$segmentation" ]; then
-		segmentation=$(basename ${segmentation})
-		cp tmp_${segmentation} single_subject_scans/${pref}/${segmentation}
-		rm tmp_${segmentation}
-	fi
-	cd single_subject_scans/${pref}/
-	template_dset=../../$(basename ${template_dset})
+	cd ${outdir}
 echo "======================================================="
 
 echo "	2) Align Single Subject Scan to the NIMH Macaque Template and align a given atlas to your single subject scan"
@@ -129,7 +125,7 @@ echo "	2) Align Single Subject Scan to the NIMH Macaque Template and align a giv
 echo "======================================================="
 
 echo "	3) Perform skull-striping and segmentation on you single subject dataset:"
-	if [ -f ../../NMT_brainmask.nii.gz ] && [ -d ../../processing_masks/ ]; then
+	if [ -f ${NMT_loc}/NMT_brainmask.nii.gz ] && [ -d ${NMT_loc}/processing_masks/ ]; then
 			echo bash ${NMT_loc}/NMT_subject_process ${dset} ${antsbrainextract}
 			bash ${NMT_loc}/NMT_subject_process ${dset} ${antsbrainextract}
 	else
@@ -142,7 +138,7 @@ echo "	3) Perform skull-striping and segmentation on you single subject dataset:
 echo "======================================================="
 
 echo "	4) Estimate cortical thickness, surface area and curvature for single subject:"
-	if [ -f ../../processing_masks/NMT_CT.nii.gz ] && [ -f ../../NMT_GM_cortical_mask.nii.gz ] && [ -f ../../NMT_GM_cortical_mask_withWM.nii.gz ]; then
+	if [ -f ${NMT_loc}/processing_masks/NMT_CT.nii.gz ] && [ -f ${NMT_loc}/NMT_GM_cortical_mask.nii.gz ] && [ -f ${NMT_loc}/NMT_GM_cortical_mask_withWM.nii.gz ]; then
 		echo bash ${NMT_loc}/NMT_subject_morph ${dset}
 		bash ${NMT_loc}/NMT_subject_morph ${dset}
 	else
