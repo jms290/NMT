@@ -1,3 +1,5 @@
+# With the release of the NMT v2, this distribution is no longer being updated. Please see our [NMT v2 page](https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/nonhuman/macaque_tempatl/template_nmtv2.html) on the AFNI website for the latest updates, or visit the [NMT v1 page](https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/nonhuman/macaque_tempatl/template_nmtv1.html) on the AFNI website for any updates to the NMT v1. Thank you.
+
 # NMT - NIMH Macaque Template
 
 For any issues or questions, contact Jakob Seidlitz at jakob.seidlitz@nih.gov or jms290@cam.ac.uk.
